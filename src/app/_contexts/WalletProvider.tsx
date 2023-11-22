@@ -54,7 +54,6 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect={autoConnect}>
         <WalletModalProvider>
-          {/* <div className="flex flex-col"> */}
           <nav className="flex justify-between p-5">
             <Image
               src={stepLogoImgUrl}
@@ -65,7 +64,6 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
             <WalletMultiButton />
           </nav>
           {children}
-          {/* </div> */}
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
