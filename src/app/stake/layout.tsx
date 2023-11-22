@@ -1,5 +1,5 @@
 import React from "react";
-import { ContextProvider } from "../_contexts/WalletProvider";
+import { ContextProvider } from "../contexts/WalletProvider";
 
 export default function StakeLayout({
   children,
