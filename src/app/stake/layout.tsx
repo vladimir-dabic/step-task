@@ -8,7 +8,7 @@ export default function StakeLayout({
 }) {
   return (
     <ContextProvider>
-      <main className="flex flex-col items-center justify-start">
+      <main className="mb-10 flex flex-col items-center justify-start">
         {children}
       </main>
     </ContextProvider>

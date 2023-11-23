@@ -29,7 +29,7 @@ import { stepLogoImgUrl } from "../constants";
 
 const WalletContextProvider = ({ children }: { children: ReactNode }) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const network = WalletAdapterNetwork.Devnet;
+  const network = WalletAdapterNetwork.Mainnet;
   const { autoConnect } = useAutoConnect();
 
   // You can also provide a custom RPC endpoint.
@@ -51,14 +51,14 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
+    <ConnectionProvider endpoint={"https://mainnet-beta.solflare.network/"}>
       <WalletProvider wallets={wallets} autoConnect={autoConnect}>
         <WalletModalProvider>
           <nav className="flex justify-between p-5">
             <Image
               src={stepLogoImgUrl}
               alt="Step finance name and logo"
-              width={100}
+              width={110}
               height={40}
             />
             <WalletMultiButton />

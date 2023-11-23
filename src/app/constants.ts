@@ -9,3 +9,7 @@ export const stepLogoImgUrl =
 
 export const stepChartImgUrl =
   "https://app.step.finance/static/media/step-disconnected-logo.e20a4f8b7497afdf9784416de8ed9862.svg";
+
+export const STEP_MINT_PUBKEY = "StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT";
+
+export const XSTEP_MINT_PUBKEY = "xStpgUCss9piqeFUk2iLVcvJEGhAdJxJQuwLkXP555G";

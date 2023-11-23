@@ -1,9 +1,9 @@
-import { ArrowDownIcon } from "@heroicons/react/24/solid";
 import React from "react";
+import Image from "next/image";
 
 const ArrowSeparator = () => (
   <div className="my-3 flex justify-center">
-    <ArrowDownIcon className="text-yellow-500" width={40} />
+    <Image src="/down-arrow.svg" width={28} height={28} alt="down arrow" />
   </div>
 );
 
