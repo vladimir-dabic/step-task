@@ -1,10 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { getAccount, TOKEN_PROGRAM_ID, getMint } from "@solana/spl-token";
+import {
+  type AccountInfo,
+  type TokenAmount,
+  PublicKey,
+  clusterApiUrl,
+} from "@solana/web3.js";
 
 import Image from "next/image";
 import {
+  STEP_MINT_PUBKEY,
+  XSTEP_MINT_PUBKEY,
   stepChartImgUrl,
   stepTokenImgUrl,
   xStepTokenImgUrl,
@@ -14,10 +23,80 @@ import clsx from "clsx";
 import SwapInput from "./Input";
 import ArrowSeparator from "../components/ArrowSeparator";
 import StakeHeaderAndDescription from "../components/StakeHeaderAndDescription";
+import { type IParsedAccountData } from "~/app/types";
 
 const Swap = () => {
   const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
+  const [stepBalance, setStepBalance] = useState<TokenAmount>();
+  const [xStepBalance, setXstepBalance] = useState<TokenAmount>();
+
+  const getTokensInfo = async () => {
+    console.log("get token info");
+
+    try {
+      const accounts = (await connection.getParsedProgramAccounts(
+        TOKEN_PROGRAM_ID,
+        {
+          filters: [
+            {
+              dataSize: 165, // number of bytes
+            },
+            {
+              memcmp: {
+                offset: 32, // number of bytes
+                bytes: publicKey?.toBase58() ?? new PublicKey("").toBase58(), // base58 encoded string
+              },
+            },
+          ],
+        },
+      )) as {
+        pubkey: PublicKey;
+        account: AccountInfo<IParsedAccountData>;
+      }[];
+
+      const step = accounts.find(
+        (item) => item.account.data.parsed.info.mint === STEP_MINT_PUBKEY,
+      );
+      if (step) {
+        setStepBalance(step.account.data.parsed.info.tokenAmount);
+      }
+
+      const xStep = accounts.find(
+        (item) => item.account.data.parsed.info.mint === XSTEP_MINT_PUBKEY,
+      );
+
+      if (xStep) {
+        setXstepBalance(xStep.account.data.parsed.info.tokenAmount);
+      }
+
+      // console.log("*********", accounts, "***********");
+
+      // console.log(
+      //   `Found ${accounts.length} token account(s) for wallet ${"MY_WALLET_ADDRESS"}: `,
+      // );
+      // accounts.forEach((account, i) => {
+      // console.log(
+      //   `-- Token Account Address ${i + 1}: ${account.pubkey.toString()} --`,
+      // );
+      // console.log(`Mint: ${account.account.data.parsed.info.mint}`);
+      // console.log(
+      //   `Amount: ${account.account.data.parsed.info.tokenAmount.uiAmount}`,
+      // );
+      // console.log("_______________________");
+      // });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    console.log("FX", publicKey);
+
+    if (publicKey) {
+      getTokensInfo().catch((err) => console.error(err));
+    }
+  }, [publicKey]);
 
   return (
     <div className="">
@@ -25,7 +104,7 @@ const Swap = () => {
       {connected ? (
         <div className="mt-4">
           <StakeHeaderAndDescription />
-          <div className=" mt-6 w-[450px]">
+          <div className="mt-[20px] w-[450px]">
             <Tab.Group>
               <Tab.List>
                 {["Stake", "Unstake"].map((item) => {
@@ -50,31 +129,64 @@ const Swap = () => {
                   );
                 })}
               </Tab.List>
-              <Tab.Panels className="bg-step-paper rounded-bl-lg rounded-br-lg rounded-tr-lg p-5">
-                <Tab.Panel>
+              <Tab.Panels
+                className="
+                bg-step-paper
+                focus
+                rounded-bl-lg
+                rounded-br-lg
+                rounded-tr-lg
+                p-5
+                "
+              >
+                <Tab.Panel className="focus:bg-none focus:outline-none">
                   <SwapInput
                     tokenName="STEP"
                     tokenUrl={stepTokenImgUrl}
                     label="You stake"
+                    balance={stepBalance?.uiAmount}
+                    onHalfClick={() => console.log("half click")}
+                    onMaxClick={() => console.log("max click")}
                   />
                   <ArrowSeparator />
                   <SwapInput
                     tokenName="xSTEP"
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
+                    balance={xStepBalance?.uiAmount}
                   />
                 </Tab.Panel>
                 <Tab.Panel>
                   <SwapInput
                     tokenName="xSTEP"
                     tokenUrl={xStepTokenImgUrl}
-                    label="You receive"
+                    label="You stake"
+                    balance={xStepBalance?.uiAmount}
+                  />
+                  <ArrowSeparator />
+                  <SwapInput
+                    tokenName="STEP"
+                    tokenUrl={stepTokenImgUrl}
+                    label="You stake"
+                    balance={stepBalance?.uiAmount}
                   />
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
-            <button className="bg-step-paper mt-6 h-10 w-full rounded-lg">
-              hej
+            <button
+              disabled
+              className="
+              bg-step-paper
+              disabled:bg-step-disabled
+              mt-6
+              h-[60px] w-full
+              p-[10px]
+              disabled:cursor-not-allowed
+              "
+            >
+              <span className="font-bold disabled:text-red-800">
+                Enter an amount
+              </span>
             </button>
           </div>
         </div>
