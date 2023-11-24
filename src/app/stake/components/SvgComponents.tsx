@@ -6,7 +6,10 @@ export interface SvgComponentProps extends SVGProps<SVGSVGElement> {
 
 const accent = "#08d69f";
 
-const UpArrow: React.FC<SvgComponentProps> = ({ fill = accent, ...props }) => (
+const UnstakeUpArrow: React.FC<SvgComponentProps> = ({
+  fill = accent,
+  ...props
+}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={14}
@@ -23,7 +26,7 @@ const UpArrow: React.FC<SvgComponentProps> = ({ fill = accent, ...props }) => (
   </svg>
 );
 
-const DownArrow: React.FC<SvgComponentProps> = ({
+const StakeDownArrow: React.FC<SvgComponentProps> = ({
   fill = accent,
   ...props
 }) => (
@@ -43,4 +46,23 @@ const DownArrow: React.FC<SvgComponentProps> = ({
   </svg>
 );
 
-export { UpArrow, DownArrow };
+const ArrowSeparator = () => (
+  <div className="my-3 flex justify-center">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={28}
+      height={28}
+      fill="none"
+      viewBox="0 0 24 28"
+    >
+      <path
+        fill="#ffbb1d"
+        fillRule="evenodd"
+        d="M22.741 14.469a1.6 1.6 0 0 1 0 2.262l-9.6 9.6a1.6 1.6 0 0 1-2.262 0l-9.6-9.6A1.6 1.6 0 1 1 3.54 14.47l6.869 6.869V2.8a1.6 1.6 0 1 1 3.2 0v18.538l6.869-6.869a1.6 1.6 0 0 1 2.262 0z"
+        clipRule="evenodd"
+      />
+    </svg>
+  </div>
+);
+
+export { UnstakeUpArrow, StakeDownArrow, ArrowSeparator };

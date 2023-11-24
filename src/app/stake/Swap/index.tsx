@@ -28,18 +28,19 @@ import {
 } from "~/app/constants";
 import { convertToRegularNum, resolveAmountInput } from "~/app/utils";
 import SwapInput from "./Input";
-import ArrowSeparator from "../components/ArrowSeparator";
 import StakeHeaderAndDescription from "../components/StakeHeaderAndDescription";
 import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
 import StakeButton from "../components/StakeButton";
-import { DownArrow, UpArrow } from "../components/SvgComponents";
+import {
+  StakeDownArrow,
+  UnstakeUpArrow,
+  ArrowSeparator,
+} from "../components/SvgComponents";
 import TabButton from "../components/TabButton";
 
 type StepLookupType = "step" | "xstep";
 
 const Swap = ({ price }: { price: string }) => {
-  console.log({ price });
-
   const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
 
@@ -165,7 +166,7 @@ const Swap = ({ price }: { price: string }) => {
                       onClick={() => setSelectedTabIndex(0)}
                       title="Stake"
                       selected={selected}
-                      SvgComponent={DownArrow}
+                      SvgComponent={StakeDownArrow}
                     />
                   )}
                 </Tab>
@@ -175,7 +176,7 @@ const Swap = ({ price }: { price: string }) => {
                       onClick={() => setSelectedTabIndex(1)}
                       title="Unstake"
                       selected={selected}
-                      SvgComponent={UpArrow}
+                      SvgComponent={UnstakeUpArrow}
                     />
                   )}
                 </Tab>
