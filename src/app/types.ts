@@ -23,3 +23,32 @@ export interface TokenAmount {
   uiAmount: number;
   uiAmountString: string;
 }
+
+export interface ResponseCoinPrice {
+  status: string;
+  data: Data;
+}
+
+export interface Data {
+  coin: Coin;
+}
+
+export interface Coin {
+  uuid: string;
+  symbol: string;
+  name: string;
+  description: string;
+  color: string;
+  iconUrl: string;
+  websiteUrl: string;
+  marketCap: string;
+  fullyDilutedMarketCap: string;
+  price: string;
+  btcPrice: string;
+  priceAt: number;
+  change: string;
+  rank: number;
+  sparkline: Array<null | string>;
+  coinrankingUrl: string;
+  tier: number;
+}
