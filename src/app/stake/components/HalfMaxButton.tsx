@@ -13,7 +13,7 @@ const HalfMaxButton = ({ text, onClick }: Props) => (
       hover:bg-step-accent
       text-step-accent
       hover:text-step-dimmedAccent
-      focus:border-step-accent
+      focus:outline-step-accent
       flex
       h-[20px]
       items-center
@@ -23,16 +23,8 @@ const HalfMaxButton = ({ text, onClick }: Props) => (
       transition
       duration-200
       ease-in-out
-      focus:border
-      focus:outline-none
+      focus:border-none
       "
-    // focus:outline-step-accent
-    // focus:border-red-400
-    // focus:outline-offset-0
-    // focus:ring
-    // focus:ring-offset-0
-    // focus:outline-none
-    // focus:bg-black
   >
     <span>{text}</span>
   </button>

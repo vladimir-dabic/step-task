@@ -1,4 +1,4 @@
-import React, { type MouseEventHandler } from "react";
+import React, { type ChangeEventHandler, type MouseEventHandler } from "react";
 import Image from "next/image";
 import HalfMaxButton from "../../components/HalfMaxButton";
 
@@ -7,6 +7,8 @@ type Props = {
   tokenUrl: string;
   label: string;
   balance: number | null | undefined;
+  value: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
   onHalfClick?: MouseEventHandler<HTMLButtonElement>;
   onMaxClick?: MouseEventHandler<HTMLButtonElement>;
 };
@@ -15,9 +17,11 @@ const SwapInput = ({
   tokenName,
   tokenUrl,
   label,
+  value,
   balance,
   onHalfClick,
   onMaxClick,
+  onChange,
 }: Props) => {
   return (
     <div className="flex flex-col">
@@ -38,6 +42,8 @@ const SwapInput = ({
         </div>
         <div className="flex flex-grow">
           <input
+            value={value}
+            onChange={onChange}
             className="
               placeholder:text-step-label
               ml-2

@@ -13,3 +13,5 @@ export const stepChartImgUrl =
 export const STEP_MINT_PUBKEY = "StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT";
 
 export const XSTEP_MINT_PUBKEY = "xStpgUCss9piqeFUk2iLVcvJEGhAdJxJQuwLkXP555G";
+
+export const STEP_DECIMALS = 9;

@@ -1,17 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {
+  type ChangeEvent,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { getAccount, TOKEN_PROGRAM_ID, getMint } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
   type AccountInfo,
   type TokenAmount,
-  PublicKey,
-  clusterApiUrl,
+  type PublicKey,
 } from "@solana/web3.js";
 
 import Image from "next/image";
 import {
+  STEP_DECIMALS,
   STEP_MINT_PUBKEY,
   XSTEP_MINT_PUBKEY,
   stepChartImgUrl,
@@ -19,20 +25,38 @@ import {
   xStepTokenImgUrl,
 } from "~/app/constants";
 import { Tab } from "@headlessui/react";
-import clsx from "clsx";
 import SwapInput from "./Input";
 import ArrowSeparator from "../components/ArrowSeparator";
 import StakeHeaderAndDescription from "../components/StakeHeaderAndDescription";
 import { type IParsedAccountData } from "~/app/types";
+import { convertToRegularNum, resolveAmountInput } from "~/app/utils";
+import BigNumber from "bignumber.js";
 
-const Swap = () => {
+type StepLookupType = "step" | "xstep";
+
+const Swap = ({ price }: { price: string }) => {
+  console.log({ price });
+
   const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
+
   const [stepBalance, setStepBalance] = useState<TokenAmount>();
   const [xStepBalance, setXstepBalance] = useState<TokenAmount>();
+  const [stepAmount, setStepAmount] = useState("");
+  const [xStepAmount, setXstepAmount] = useState("");
+
+  const amountLookup = {
+    step: { get: stepAmount, set: setStepAmount },
+    xstep: { get: xStepAmount, set: setXstepAmount },
+  };
+
+  const balanceLookup = {
+    step: { get: stepBalance, set: setStepBalance },
+    xstep: { get: xStepBalance, set: setXstepBalance },
+  };
 
   const getTokensInfo = async () => {
-    console.log("get token info");
+    if (!publicKey) return;
 
     try {
       const accounts = (await connection.getParsedProgramAccounts(
@@ -45,7 +69,7 @@ const Swap = () => {
             {
               memcmp: {
                 offset: 32, // number of bytes
-                bytes: publicKey?.toBase58() ?? new PublicKey("").toBase58(), // base58 encoded string
+                bytes: publicKey?.toBase58(),
               },
             },
           ],
@@ -58,6 +82,8 @@ const Swap = () => {
       const step = accounts.find(
         (item) => item.account.data.parsed.info.mint === STEP_MINT_PUBKEY,
       );
+      console.log({ step });
+
       if (step) {
         setStepBalance(step.account.data.parsed.info.tokenAmount);
       }
@@ -90,6 +116,35 @@ const Swap = () => {
     }
   };
 
+  const handleAmountChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    type: StepLookupType,
+  ) => {
+    try {
+      const amount = resolveAmountInput(event.target.value, STEP_DECIMALS);
+      amountLookup[type].set(amount);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleHalfClick = (type: StepLookupType) => {
+    const result = new BigNumber(balanceLookup[type].get?.uiAmount ?? 0)
+      .dividedBy(2)
+      .toString();
+
+    amountLookup[type].set(convertToRegularNum(result, STEP_DECIMALS));
+  };
+
+  const handleMaxClick = (type: StepLookupType) => {
+    const result = convertToRegularNum(
+      balanceLookup[type].get?.uiAmount ?? 0,
+      STEP_DECIMALS,
+    );
+
+    amountLookup[type].set(convertToRegularNum(result, STEP_DECIMALS));
+  };
+
   useEffect(() => {
     console.log("FX", publicKey);
 
@@ -111,18 +166,17 @@ const Swap = () => {
                   return (
                     <Tab
                       key={item}
-                      className={clsx(
-                        "bg-step-paper",
-                        "ui-not-selected:opacity-20",
-                        "ui-selected:text-teal-400",
-                        // "ui-selected:text-step-accent",
-                        "rounded-t-lg",
-                        "p-3",
-                        "font-bold",
-                        "transition-all",
-                        "duration-150",
-                        "focus:outline-none",
-                      )}
+                      className="
+                        bg-step-paper
+                        ui-not-selected:opacity-20
+                        ui-selected:text-teal-400
+                        rounded-t-lg
+                        p-3
+                        font-bold
+                        transition-all
+                        duration-150
+                        focus:outline-none
+                      "
                     >
                       {item}
                     </Tab>
@@ -131,44 +185,60 @@ const Swap = () => {
               </Tab.List>
               <Tab.Panels
                 className="
-                bg-step-paper
-                focus
-                rounded-bl-lg
-                rounded-br-lg
-                rounded-tr-lg
-                p-5
-                "
+                  bg-step-paper
+                  focus
+                  rounded-bl-lg
+                  rounded-br-lg
+                  rounded-tr-lg
+                  p-5
+                  "
               >
+                {/* STAKE */}
                 <Tab.Panel className="focus:bg-none focus:outline-none">
                   <SwapInput
                     tokenName="STEP"
+                    value={stepAmount}
                     tokenUrl={stepTokenImgUrl}
                     label="You stake"
                     balance={stepBalance?.uiAmount}
-                    onHalfClick={() => console.log("half click")}
-                    onMaxClick={() => console.log("max click")}
+                    onChange={(event) => handleAmountChange(event, "step")}
+                    onHalfClick={() => handleHalfClick("step")}
+                    onMaxClick={() => handleMaxClick("step")}
                   />
                   <ArrowSeparator />
                   <SwapInput
                     tokenName="xSTEP"
+                    value={xStepAmount}
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
+                    onChange={(event) => handleAmountChange(event, "xstep")}
+                    onHalfClick={() => handleHalfClick("xstep")}
+                    onMaxClick={() => handleMaxClick("xstep")}
                   />
                 </Tab.Panel>
+                {/* UNSTAKE */}
                 <Tab.Panel>
                   <SwapInput
                     tokenName="xSTEP"
+                    value={stepAmount}
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
+                    onChange={(event) => handleAmountChange(event, "step")}
+                    onHalfClick={() => handleHalfClick("step")}
+                    onMaxClick={() => handleMaxClick("step")}
                   />
                   <ArrowSeparator />
                   <SwapInput
                     tokenName="STEP"
+                    value={xStepAmount}
                     tokenUrl={stepTokenImgUrl}
                     label="You stake"
                     balance={stepBalance?.uiAmount}
+                    onChange={(event) => handleAmountChange(event, "step")}
+                    onHalfClick={() => handleHalfClick("xstep")}
+                    onMaxClick={() => handleMaxClick("xstep")}
                   />
                 </Tab.Panel>
               </Tab.Panels>
@@ -176,12 +246,12 @@ const Swap = () => {
             <button
               disabled
               className="
-              bg-step-paper
-              disabled:bg-step-disabled
-              mt-6
-              h-[60px] w-full
-              p-[10px]
-              disabled:cursor-not-allowed
+                bg-step-paper
+                disabled:bg-step-disabled
+                mt-6
+                h-[60px] w-full
+                p-[10px]
+                disabled:cursor-not-allowed
               "
             >
               <span className="font-bold disabled:text-red-800">
