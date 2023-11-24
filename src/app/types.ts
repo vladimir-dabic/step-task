@@ -52,3 +52,9 @@ export interface Coin {
   coinrankingUrl: string;
   tier: number;
 }
+
+export type StakeButtonTextType =
+  | "insufficientStep"
+  | "insufficientXstep"
+  | "enterAmount"
+  | "stake";

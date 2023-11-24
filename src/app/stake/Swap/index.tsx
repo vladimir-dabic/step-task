@@ -1,6 +1,7 @@
 "use client";
 
-import React, { type ChangeEvent, useEffect, useState } from "react";
+import React, { type ChangeEvent, useEffect, useState, useMemo } from "react";
+import { Tab } from "@headlessui/react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
@@ -8,8 +9,9 @@ import {
   type TokenAmount,
   type PublicKey,
 } from "@solana/web3.js";
-
+import BigNumber from "bignumber.js";
 import Image from "next/image";
+
 import {
   STEP_DECIMALS,
   STEP_MINT_PUBKEY,
@@ -18,13 +20,12 @@ import {
   stepTokenImgUrl,
   xStepTokenImgUrl,
 } from "~/app/constants";
-import { Tab } from "@headlessui/react";
+import { convertToRegularNum, resolveAmountInput } from "~/app/utils";
 import SwapInput from "./Input";
 import ArrowSeparator from "../components/ArrowSeparator";
 import StakeHeaderAndDescription from "../components/StakeHeaderAndDescription";
-import { type IParsedAccountData } from "~/app/types";
-import { convertToRegularNum, resolveAmountInput } from "~/app/utils";
-import BigNumber from "bignumber.js";
+import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
+import StakeButton from "../components/StakeButton";
 
 type StepLookupType = "step" | "xstep";
 
@@ -122,6 +123,16 @@ const Swap = ({ price }: { price: string }) => {
 
     amountLookup[type].set(convertToRegularNum(result, STEP_DECIMALS));
   };
+
+  const buttonType = useMemo<StakeButtonTextType>(() => {
+    if (!+stepAmount) {
+      return "enterAmount";
+    }
+    if (new BigNumber(stepAmount).isGreaterThan(stepBalance?.uiAmount ?? 0)) {
+      return "insufficientStep";
+    }
+    return "stake";
+  }, [stepAmount, stepBalance?.uiAmount]);
 
   useEffect(() => {
     if (publicKey) {
@@ -225,21 +236,10 @@ const Swap = ({ price }: { price: string }) => {
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
-            <button
-              disabled
-              className="
-                bg-step-paper
-                disabled:bg-step-disabled
-                mt-6
-                h-[60px] w-full
-                p-[10px]
-                disabled:cursor-not-allowed
-              "
-            >
-              <span className="font-bold disabled:text-red-800">
-                Enter an amount
-              </span>
-            </button>
+            <StakeButton
+              textType={buttonType}
+              onClick={() => console.log("stake")}
+            />
           </div>
         </div>
       ) : (
