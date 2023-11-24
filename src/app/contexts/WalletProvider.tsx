@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useMemo, type ReactNode } from "react";
+import Image from "next/image";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { clusterApiUrl } from "@solana/web3.js";
 import {
   UnsafeBurnerWalletAdapter,
   SolflareWalletAdapter,
@@ -19,11 +21,11 @@ import {
   WalletModalProvider,
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
-import { clusterApiUrl } from "@solana/web3.js";
-import Image from "next/image";
-import "./layout.css";
+
+import { env } from "~/env.mjs";
 import { AutoConnectProvider, useAutoConnect } from "./AutoConnectProvider";
 import { stepLogoImgUrl } from "../constants";
+import "./layout.css";
 
 // require("@solana/wallet-adapter-react-ui/styles.css");
 
@@ -51,7 +53,7 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-    <ConnectionProvider endpoint={"https://mainnet-beta.solflare.network/"}>
+    <ConnectionProvider endpoint={env.NEXT_PUBLIC_SOLANA_RPC_URL}>
       <WalletProvider wallets={wallets} autoConnect={autoConnect}>
         <WalletModalProvider>
           <nav className="flex justify-between p-5">
