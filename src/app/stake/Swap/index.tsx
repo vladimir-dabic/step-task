@@ -26,6 +26,7 @@ import ArrowSeparator from "../components/ArrowSeparator";
 import StakeHeaderAndDescription from "../components/StakeHeaderAndDescription";
 import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
 import StakeButton from "../components/StakeButton";
+import { DownArrow, UpArrow } from "../components/SvgComponents";
 
 type StepLookupType = "step" | "xstep";
 
@@ -150,14 +151,26 @@ const Swap = ({ price }: { price: string }) => {
           <div className="mt-[20px] w-[450px]">
             <Tab.Group>
               <Tab.List>
-                {["Stake", "Unstake"].map((item) => {
+                {[
+                  {
+                    title: "Stake",
+                    src: "/down-stake-icon.svg",
+                    svg: <DownArrow />,
+                  },
+                  {
+                    title: "Unstake",
+                    src: "/up-stake-icon.svg",
+                    svg: <UpArrow />,
+                  },
+                ].map((item) => {
                   return (
                     <Tab
-                      key={item}
+                      key={item.title}
                       className="
                         bg-step-paper
                         ui-not-selected:opacity-20
                         ui-selected:text-step-accent
+                        w-[150px]
                         rounded-t-lg
                         p-3
                         text-sm
@@ -167,7 +180,12 @@ const Swap = ({ price }: { price: string }) => {
                         focus:outline-none
                       "
                     >
-                      <div>{item}</div>
+                      <div className="flex items-center justify-center">
+                        {item.svg}
+                        <span className="ml-[15px] font-bold">
+                          {item.title}
+                        </span>
+                      </div>
                     </Tab>
                   );
                 })}
