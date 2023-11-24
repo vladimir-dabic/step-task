@@ -1,13 +1,19 @@
-import React, { type ChangeEventHandler, type MouseEventHandler } from "react";
+import React, {
+  useMemo,
+  type ChangeEventHandler,
+  type MouseEventHandler,
+} from "react";
 import Image from "next/image";
 import HalfMaxButton from "../../components/HalfMaxButton";
+import BigNumber from "bignumber.js";
 
 type Props = {
   tokenName: string;
   tokenUrl: string;
   label: string;
   balance: number | null | undefined;
-  value: string;
+  amount: string;
+  price: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
   onHalfClick?: MouseEventHandler<HTMLButtonElement>;
   onMaxClick?: MouseEventHandler<HTMLButtonElement>;
@@ -17,12 +23,18 @@ const SwapInput = ({
   tokenName,
   tokenUrl,
   label,
-  value,
+  amount,
+  price,
   balance,
   onHalfClick,
   onMaxClick,
   onChange,
 }: Props) => {
+  const calculatedValue = useMemo(() => {
+    const result = new BigNumber(price).times(amount).toFixed(2);
+    return +result ? `$${result}` : `< $0.01`;
+  }, [amount, price]);
+
   return (
     <div className="flex flex-col">
       <div className="mb-3 flex justify-between">
@@ -41,22 +53,33 @@ const SwapInput = ({
           <span className="ml-2 mr-2">{tokenName}</span>
         </div>
         <div className="flex flex-grow">
-          <input
-            value={value}
-            onChange={onChange}
-            className="
-              placeholder:text-step-label
-              ml-2
-              h-[28px]
-              w-full
-              bg-black
-              text-right
-              font-mono
-              focus:bg-none
-              focus:outline-none
-              "
-            placeholder="0.00"
-          />
+          <div className="flex w-full flex-col items-center">
+            <div className="flex w-full">
+              <input
+                value={amount}
+                onChange={onChange}
+                className="
+                  placeholder:text-step-label
+                  ml-2
+                  h-[28px]
+                  w-full
+                  bg-black
+                  text-right
+                  font-mono
+                  focus:bg-none
+                  focus:outline-none
+                  "
+                placeholder="0.00"
+              />
+            </div>
+            {+amount ? (
+              <div className="flex w-full justify-end text-[12px] ">
+                <span className="text-step-label font-mono">
+                  {calculatedValue}
+                </span>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

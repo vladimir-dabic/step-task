@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  type ChangeEvent,
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { type ChangeEvent, useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
@@ -95,22 +89,6 @@ const Swap = ({ price }: { price: string }) => {
       if (xStep) {
         setXstepBalance(xStep.account.data.parsed.info.tokenAmount);
       }
-
-      // console.log("*********", accounts, "***********");
-
-      // console.log(
-      //   `Found ${accounts.length} token account(s) for wallet ${"MY_WALLET_ADDRESS"}: `,
-      // );
-      // accounts.forEach((account, i) => {
-      // console.log(
-      //   `-- Token Account Address ${i + 1}: ${account.pubkey.toString()} --`,
-      // );
-      // console.log(`Mint: ${account.account.data.parsed.info.mint}`);
-      // console.log(
-      //   `Amount: ${account.account.data.parsed.info.tokenAmount.uiAmount}`,
-      // );
-      // console.log("_______________________");
-      // });
     } catch (err) {
       console.error(err);
     }
@@ -146,11 +124,10 @@ const Swap = ({ price }: { price: string }) => {
   };
 
   useEffect(() => {
-    console.log("FX", publicKey);
-
     if (publicKey) {
       getTokensInfo().catch((err) => console.error(err));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);
 
   return (
@@ -169,16 +146,17 @@ const Swap = ({ price }: { price: string }) => {
                       className="
                         bg-step-paper
                         ui-not-selected:opacity-20
-                        ui-selected:text-teal-400
+                        ui-selected:text-step-accent
                         rounded-t-lg
                         p-3
+                        text-sm
                         font-bold
                         transition-all
                         duration-150
                         focus:outline-none
                       "
                     >
-                      {item}
+                      <div>{item}</div>
                     </Tab>
                   );
                 })}
@@ -197,7 +175,8 @@ const Swap = ({ price }: { price: string }) => {
                 <Tab.Panel className="focus:bg-none focus:outline-none">
                   <SwapInput
                     tokenName="STEP"
-                    value={stepAmount}
+                    amount={stepAmount}
+                    price={price}
                     tokenUrl={stepTokenImgUrl}
                     label="You stake"
                     balance={stepBalance?.uiAmount}
@@ -208,7 +187,8 @@ const Swap = ({ price }: { price: string }) => {
                   <ArrowSeparator />
                   <SwapInput
                     tokenName="xSTEP"
-                    value={xStepAmount}
+                    amount={xStepAmount}
+                    price={price}
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
@@ -221,7 +201,8 @@ const Swap = ({ price }: { price: string }) => {
                 <Tab.Panel>
                   <SwapInput
                     tokenName="xSTEP"
-                    value={stepAmount}
+                    amount={stepAmount}
+                    price={price}
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
@@ -232,7 +213,8 @@ const Swap = ({ price }: { price: string }) => {
                   <ArrowSeparator />
                   <SwapInput
                     tokenName="STEP"
-                    value={xStepAmount}
+                    amount={xStepAmount}
+                    price={price}
                     tokenUrl={stepTokenImgUrl}
                     label="You stake"
                     balance={stepBalance?.uiAmount}
