@@ -21,6 +21,7 @@ export default {
           accent: "#08d69f",
           dimmedAccent: "#003628",
           paper: "#141414",
+          dimmedPaper: "#0A0A0A",
           description: "#b2b2b2",
           label: "#7d7d7d",
           disabled: "#3d3d3d",

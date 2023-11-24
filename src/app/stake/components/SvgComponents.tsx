@@ -1,6 +1,6 @@
 import React, { type SVGProps } from "react";
 
-interface SvgComponentProps extends SVGProps<SVGSVGElement> {
+export interface SvgComponentProps extends SVGProps<SVGSVGElement> {
   fill?: string;
 }
 

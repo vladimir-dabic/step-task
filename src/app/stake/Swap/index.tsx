@@ -1,6 +1,12 @@
 "use client";
 
-import React, { type ChangeEvent, useEffect, useState, useMemo } from "react";
+import React, {
+  type ChangeEvent,
+  useEffect,
+  useState,
+  useMemo,
+  Fragment,
+} from "react";
 import { Tab } from "@headlessui/react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
@@ -27,6 +33,7 @@ import StakeHeaderAndDescription from "../components/StakeHeaderAndDescription";
 import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
 import StakeButton from "../components/StakeButton";
 import { DownArrow, UpArrow } from "../components/SvgComponents";
+import TabButton from "../components/TabButton";
 
 type StepLookupType = "step" | "xstep";
 
@@ -40,6 +47,7 @@ const Swap = ({ price }: { price: string }) => {
   const [xStepBalance, setXstepBalance] = useState<TokenAmount>();
   const [stepAmount, setStepAmount] = useState("");
   const [xStepAmount, setXstepAmount] = useState("");
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   const amountLookup = {
     step: { get: stepAmount, set: setStepAmount },
@@ -149,46 +157,28 @@ const Swap = ({ price }: { price: string }) => {
         <div className="mt-4">
           <StakeHeaderAndDescription />
           <div className="mt-[20px] w-[450px]">
-            <Tab.Group>
+            <Tab.Group selectedIndex={selectedTabIndex}>
               <Tab.List>
-                {[
-                  {
-                    title: "Stake",
-                    src: "/down-stake-icon.svg",
-                    svg: <DownArrow />,
-                  },
-                  {
-                    title: "Unstake",
-                    src: "/up-stake-icon.svg",
-                    svg: <UpArrow />,
-                  },
-                ].map((item) => {
-                  return (
-                    <Tab
-                      key={item.title}
-                      className="
-                        bg-step-paper
-                        ui-not-selected:opacity-20
-                        ui-selected:text-step-accent
-                        w-[150px]
-                        rounded-t-lg
-                        p-3
-                        text-sm
-                        font-bold
-                        transition-all
-                        duration-150
-                        focus:outline-none
-                      "
-                    >
-                      <div className="flex items-center justify-center">
-                        {item.svg}
-                        <span className="ml-[15px] font-bold">
-                          {item.title}
-                        </span>
-                      </div>
-                    </Tab>
-                  );
-                })}
+                <Tab as={Fragment}>
+                  {({ selected }) => (
+                    <TabButton
+                      onClick={() => setSelectedTabIndex(0)}
+                      title="Stake"
+                      selected={selected}
+                      SvgComponent={DownArrow}
+                    />
+                  )}
+                </Tab>
+                <Tab as={Fragment}>
+                  {({ selected }) => (
+                    <TabButton
+                      onClick={() => setSelectedTabIndex(1)}
+                      title="Unstake"
+                      selected={selected}
+                      SvgComponent={UpArrow}
+                    />
+                  )}
+                </Tab>
               </Tab.List>
               <Tab.Panels
                 className="
