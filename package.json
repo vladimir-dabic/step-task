@@ -21,6 +21,7 @@
     "@solana/wallet-adapter-wallets": "^0.19.23",
     "@solana/web3.js": "^1.87.6",
     "@t3-oss/env-nextjs": "^0.7.0",
+    "bignumber.js": "^9.1.2",
     "clsx": "^2.0.0",
     "next": "^14.0.0",
     "react": "18.2.0",
