@@ -11,6 +11,7 @@ const lookupText = {
   insufficientXstep: "Insufficient xSTEP balance",
   enterAmount: "Enter an amount",
   stake: "Stake",
+  approveFromWallet: "Approve transactions from your wallet",
 };
 
 const StakeButton = ({ textType, onClick }: Props) => {

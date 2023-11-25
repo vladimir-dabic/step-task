@@ -73,6 +73,7 @@ const StakeContainer = ({ price }: { price: string }) => {
   const [xStepAmount, setXstepAmount] = useState("");
   const [xPrice, setXPrice] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [txFlowInProgress, setTxFlowInProgress] = useState(false);
   /* Program state */
   const [program, setProgram] = useState<Program<Idl>>();
   const [vaultPubkey, setVaultPubkey] = useState<PublicKey>();
@@ -106,8 +107,13 @@ const StakeContainer = ({ price }: { price: string }) => {
       return "insufficientXstep";
     }
 
+    if (txFlowInProgress) {
+      return "approveFromWallet";
+    }
+
     return "stake";
   }, [
+    txFlowInProgress,
     selectedTabIndex,
     stepAmount,
     stepBalance?.uiAmount,
@@ -274,9 +280,12 @@ const StakeContainer = ({ price }: { price: string }) => {
     if (!wallet || !program || !stepToken || !xStepToken) return;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const txAmount = new BN(5_000_000_000);
+    const txAmount = new BN(5_000_000_000); // TODO: real amount/ lamports
+    setTxFlowInProgress(true);
 
     try {
+      console.log("handle anchor");
+
       /* @ts-expect-error  because! :D */
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await program.rpc.stake(vaultBump, txAmount, {
@@ -292,6 +301,8 @@ const StakeContainer = ({ price }: { price: string }) => {
       });
     } catch (err) {
       console.log("Handle Anchor Error:", err);
+    } finally {
+      setTxFlowInProgress(false);
     }
   };
 
