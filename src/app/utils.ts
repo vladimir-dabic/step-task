@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { STEP_DECIMALS } from "./constants";
 
 /**
  * Checks if a string representation of a number has valid amount of decimals.
@@ -33,7 +34,7 @@ const resolveAmountInput = (inputValue: string, decimals: number) => {
   /* trim and replace input value */
   const value = inputValue.includes(",")
     ? inputValue.replace(",", ".")
-    : inputValue.trim(); // TODO: trim replaced?
+    : inputValue.trim();
 
   const isValid = isValidPositiveNumber(value);
 
@@ -57,8 +58,11 @@ const resolveAmountInput = (inputValue: string, decimals: number) => {
  * @param decimals - The number of decimal places to display if number is < 1.
  * @returns The converted number as a string without trailing zeros.
  */
-const convertToRegularNum = (num: string | number, decimals: number) => {
-  return new BigNumber(num).toFixed(decimals || 99).replace(/\.?0+$/, "");
+const convertToRegularNum = (
+  num: string | number | BigNumber,
+  decimals = STEP_DECIMALS,
+) => {
+  return new BigNumber(num).toFixed(decimals).replace(/\.?0+$/, "");
 };
 
 export {

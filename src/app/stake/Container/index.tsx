@@ -66,14 +66,17 @@ const StakeContainer = ({ price }: { price: string }) => {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
-  const [program, setProgram] = useState<Program<Idl>>();
-  const [vaultPubkey, setVaultPubkey] = useState<PublicKey>();
-  const [vaultBump, setVaultBump] = useState<number>();
   const [stepToken, setStepToken] = useState<RpcTokensResponse | undefined>();
   const [xStepToken, setXstepToken] = useState<RpcTokensResponse | undefined>();
   const [stepAmount, setStepAmount] = useState("");
+  const [stepPerXstepRatio, setStepPerXstepRatio] = useState<string>();
   const [xStepAmount, setXstepAmount] = useState("");
+  const [xPrice, setXPrice] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  /* Program state */
+  const [program, setProgram] = useState<Program<Idl>>();
+  const [vaultPubkey, setVaultPubkey] = useState<PublicKey>();
+  const [vaultBump, setVaultBump] = useState<number>();
 
   const stepBalance = useMemo<TokenAmount | undefined>(
     () => stepToken?.account.data.parsed.info.tokenAmount,
@@ -172,12 +175,14 @@ const StakeContainer = ({ price }: { price: string }) => {
         accounts: {
           tokenMint: stepMintPubkey,
           xTokenMint: xStepMintPubkey,
-          tokenVault: vaultPubkey,
+          tokenVault: _vaultPubkey,
         },
       });
       if (res) {
-        const price = res.events[0]?.data;
-        console.log({ price });
+        const ratio = res.events[0]?.data.stepPerXstep as string;
+        setStepPerXstepRatio(ratio);
+        const _xPrice = new BigNumber(price).times(ratio).toString();
+        setXPrice(_xPrice);
       }
     } catch (err) {
       console.error(err);
@@ -188,29 +193,65 @@ const StakeContainer = ({ price }: { price: string }) => {
     event: ChangeEvent<HTMLInputElement>,
     type: StepLookupType,
   ) => {
+    let amount = "";
     try {
-      const amount = resolveAmountInput(event.target.value, STEP_DECIMALS);
+      amount = resolveAmountInput(event.target.value, STEP_DECIMALS);
       amountLookup[type].set(amount);
     } catch (err) {
-      console.log(err);
+      console.log(`%c${err as string}`, "color: red; font-weight: bold;");
+      return;
+    }
+
+    /* Update XSTEP amount */
+    if (type === "step") {
+      if (amount && stepPerXstepRatio) {
+        const bnXStepAmount = new BigNumber(amount).dividedBy(
+          stepPerXstepRatio,
+        );
+        setXstepAmount(convertToRegularNum(bnXStepAmount));
+      } else {
+        setXstepAmount("");
+      }
+    }
+    /* Update STEP amount */
+    if (type === "xstep") {
+      if (amount && stepPerXstepRatio) {
+        const bnStepAmount = new BigNumber(amount).times(stepPerXstepRatio);
+        setStepAmount(convertToRegularNum(bnStepAmount));
+      } else {
+        setStepAmount("");
+      }
     }
   };
 
-  const handleHalfClick = (type: StepLookupType) => {
-    const result = new BigNumber(balanceLookup[type]?.uiAmount ?? 0)
-      .dividedBy(2)
-      .toString();
-
-    amountLookup[type].set(convertToRegularNum(result, STEP_DECIMALS));
-  };
-
-  const handleMaxClick = (type: StepLookupType) => {
-    const result = convertToRegularNum(
-      balanceLookup[type]?.uiAmount ?? 0,
-      STEP_DECIMALS,
+  const handleHalfMaxClick = (
+    type: StepLookupType,
+    divideType: "half" | "max",
+  ) => {
+    const result = new BigNumber(balanceLookup[type]?.uiAmount ?? 0).dividedBy(
+      divideType === "half" ? 2 : 1,
     );
 
-    amountLookup[type].set(convertToRegularNum(result, STEP_DECIMALS));
+    const newAmount = convertToRegularNum(result);
+    amountLookup[type].set(newAmount);
+
+    /* Update XSTEP amount */
+    if (type === "step") {
+      if (stepPerXstepRatio) {
+        const bnXStepAmount = new BigNumber(newAmount).dividedBy(
+          stepPerXstepRatio,
+        );
+        setXstepAmount(convertToRegularNum(bnXStepAmount));
+      }
+    }
+
+    /* Update STEP amount */
+    if (type === "xstep") {
+      if (stepPerXstepRatio) {
+        const bnStepAmount = new BigNumber(newAmount).times(stepPerXstepRatio);
+        setStepAmount(convertToRegularNum(bnStepAmount));
+      }
+    }
   };
 
   const handleAnchor = async () => {
@@ -298,20 +339,18 @@ const StakeContainer = ({ price }: { price: string }) => {
                     label="You stake"
                     balance={stepBalance?.uiAmount}
                     onChange={(event) => handleAmountChange(event, "step")}
-                    onHalfClick={() => handleHalfClick("step")}
-                    onMaxClick={() => handleMaxClick("step")}
+                    onHalfClick={() => handleHalfMaxClick("step", "half")}
+                    onMaxClick={() => handleHalfMaxClick("step", "max")}
                   />
                   <ArrowSeparator />
                   <SwapInput
                     tokenName="xSTEP"
                     amount={xStepAmount}
-                    price={price}
+                    price={xPrice}
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
                     onChange={(event) => handleAmountChange(event, "xstep")}
-                    onHalfClick={() => handleHalfClick("xstep")}
-                    onMaxClick={() => handleMaxClick("xstep")}
                   />
                 </Tab.Panel>
                 {/* UNSTAKE */}
@@ -319,13 +358,13 @@ const StakeContainer = ({ price }: { price: string }) => {
                   <SwapInput
                     tokenName="xSTEP"
                     amount={xStepAmount}
-                    price={price}
+                    price={xPrice}
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
                     onChange={(event) => handleAmountChange(event, "xstep")}
-                    onHalfClick={() => handleHalfClick("step")}
-                    onMaxClick={() => handleMaxClick("step")}
+                    onHalfClick={() => handleHalfMaxClick("xstep", "half")}
+                    onMaxClick={() => handleHalfMaxClick("xstep", "max")}
                   />
                   <ArrowSeparator />
                   <SwapInput
@@ -336,8 +375,6 @@ const StakeContainer = ({ price }: { price: string }) => {
                     label="You stake"
                     balance={stepBalance?.uiAmount}
                     onChange={(event) => handleAmountChange(event, "step")}
-                    onHalfClick={() => handleHalfClick("xstep")}
-                    onMaxClick={() => handleMaxClick("xstep")}
                   />
                 </Tab.Panel>
               </Tab.Panels>
@@ -345,7 +382,7 @@ const StakeContainer = ({ price }: { price: string }) => {
             <StakeButton
               textType={buttonType}
               onClick={() => {
-                handleAnchor().catch((err) => console.error(err));
+                void handleAnchor();
                 console.log("stake");
               }}
             />
