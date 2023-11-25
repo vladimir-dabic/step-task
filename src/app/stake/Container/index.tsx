@@ -92,11 +92,28 @@ const StakeContainer = ({ price }: { price: string }) => {
     if (!+stepAmount) {
       return "enterAmount";
     }
-    if (new BigNumber(stepAmount).isGreaterThan(stepBalance?.uiAmount ?? 0)) {
+    if (
+      new BigNumber(stepAmount).isGreaterThan(stepBalance?.uiAmount ?? 0) &&
+      selectedTabIndex === 0
+    ) {
       return "insufficientStep";
     }
+
+    if (
+      new BigNumber(xStepAmount).isGreaterThan(xStepBalance?.uiAmount ?? 0) &&
+      selectedTabIndex === 1
+    ) {
+      return "insufficientXstep";
+    }
+
     return "stake";
-  }, [stepAmount, stepBalance?.uiAmount]);
+  }, [
+    selectedTabIndex,
+    stepAmount,
+    stepBalance?.uiAmount,
+    xStepAmount,
+    xStepBalance?.uiAmount,
+  ]);
 
   const amountLookup = {
     step: { get: stepAmount, set: setStepAmount },
@@ -138,7 +155,6 @@ const StakeContainer = ({ price }: { price: string }) => {
       const xStep = accounts.find(
         (item) => item.account.data.parsed.info.mint === XSTEP_MINT_PUBKEY,
       );
-      console.log({ step, xStep });
 
       if (xStep) setXstepToken(xStep);
     } catch (err) {
