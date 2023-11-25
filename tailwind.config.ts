@@ -12,7 +12,6 @@ export default {
     },
     extend: {
       fontFamily: {
-        // sans: ["var(--font-sans)", ...fontFamily.sans],
         sans: ["Plus Jakarta Sans", ...fontFamily.sans],
         mono: ["Space Mono"],
       },
@@ -27,12 +26,6 @@ export default {
           disabled: "#3d3d3d",
         },
       },
-      // ringColor: {
-      //   DEFAULT: "#08d69f",
-      // },
-      // ringOffsetColor: {
-      //   DEFAULT: "#08d69f",
-      // },
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-var-requires

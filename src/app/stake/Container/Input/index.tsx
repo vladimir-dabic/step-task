@@ -4,8 +4,9 @@ import React, {
   type MouseEventHandler,
 } from "react";
 import Image from "next/image";
-import HalfMaxButton from "../../components/HalfMaxButton";
 import BigNumber from "bignumber.js";
+
+import { HalfMaxButton } from "../../components";
 
 type Props = {
   tokenName: string;

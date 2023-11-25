@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import Swap from "./Swap";
+import Swap from "./Container";
 import { env } from "~/env.mjs";
 import { type ResponseCoinPrice } from "../types";
 

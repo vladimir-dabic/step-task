@@ -38,15 +38,15 @@ import {
 } from "~/app/constants";
 import { convertToRegularNum, resolveAmountInput } from "~/app/utils";
 import SwapInput from "./Input";
-import StakeHeaderAndDescription from "../components/StakeHeaderAndDescription";
-import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
-import StakeButton from "../components/StakeButton";
 import {
+  StakeHeaderAndDescription,
+  StakeButton,
   StakeDownArrow,
   UnstakeUpArrow,
   ArrowSeparator,
-} from "../components/SvgComponents";
-import TabButton from "../components/TabButton";
+  TabButton,
+} from "../components";
+import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
 
 import idl from "~/app/step_staking.json";
 
@@ -61,7 +61,7 @@ const programId = new PublicKey("Stk5NCWomVN3itaFjLu382u9ibb5jMSHEsh6CuhaGjB");
 const stepMintPubkey = new PublicKey(STEP_MINT_PUBKEY);
 const xStepMintPubkey = new PublicKey(XSTEP_MINT_PUBKEY);
 
-const Swap = ({ price }: { price: string }) => {
+const StakeContainer = ({ price }: { price: string }) => {
   const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -369,4 +369,4 @@ const Swap = ({ price }: { price: string }) => {
   );
 };
 
-export default Swap;
+export default StakeContainer;
