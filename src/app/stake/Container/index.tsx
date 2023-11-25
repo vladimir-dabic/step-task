@@ -14,12 +14,7 @@ import {
   useAnchorWallet,
 } from "@solana/wallet-adapter-react";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import {
-  type AccountInfo,
-  type TokenAmount,
-  PublicKey,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { type AccountInfo, type TokenAmount, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
@@ -300,7 +295,7 @@ const StakeContainer = ({ price }: { price: string }) => {
       selectedTabIndex ? xStepAmount : stepAmount,
     );
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const txAmount = new BN(targetAmount); // TODO: real amount/ lamports
+    const txAmount = new BN(targetAmount);
     setTxFlowInProgress(true);
 
     try {
