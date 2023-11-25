@@ -14,8 +14,14 @@ import {
   useAnchorWallet,
 } from "@solana/wallet-adapter-react";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { type AccountInfo, type TokenAmount, PublicKey } from "@solana/web3.js";
+import {
+  type AccountInfo,
+  type TokenAmount,
+  PublicKey,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 import BigNumber from "bignumber.js";
+import { toast } from "react-hot-toast";
 import Image from "next/image";
 import {
   type Idl,
@@ -36,7 +42,11 @@ import {
   stepTokenImgUrl,
   xStepTokenImgUrl,
 } from "~/app/constants";
-import { convertToRegularNum, resolveAmountInput } from "~/app/utils";
+import {
+  convertDecimalsToAmount,
+  convertToRegularNum,
+  resolveAmountInput,
+} from "~/app/utils";
 import SwapInput from "./Input";
 import {
   StakeHeaderAndDescription,
@@ -49,6 +59,12 @@ import {
 import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
 
 import idl from "~/app/step_staking.json";
+import {
+  ApproveFromWalletNotification,
+  ErrorNotification,
+  YouAreStakingNotification,
+} from "../components/NotificationComponents";
+import AccountListener from "./AccountListener";
 
 type StepLookupType = "step" | "xstep";
 
@@ -131,6 +147,7 @@ const StakeContainer = ({ price }: { price: string }) => {
     xstep: xStepBalance,
   };
 
+  // TODO: maybe with anchor?
   const getTokensInfo = async () => {
     if (!publicKey) return;
 
@@ -279,8 +296,11 @@ const StakeContainer = ({ price }: { price: string }) => {
   const handleAnchor = async () => {
     if (!wallet || !program || !stepToken || !xStepToken) return;
 
+    const targetAmount = convertDecimalsToAmount(
+      selectedTabIndex ? xStepAmount : stepAmount,
+    );
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const txAmount = new BN(5_000_000_000); // TODO: real amount/ lamports
+    const txAmount = new BN(targetAmount); // TODO: real amount/ lamports
     setTxFlowInProgress(true);
 
     try {
@@ -288,7 +308,7 @@ const StakeContainer = ({ price }: { price: string }) => {
 
       /* @ts-expect-error  because! :D */
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await program.rpc.stake(vaultBump, txAmount, {
+      const sig = await program.rpc.stake(vaultBump, txAmount, {
         accounts: {
           tokenMint: stepMintPubkey,
           xTokenMint: xStepMintPubkey,
@@ -299,11 +319,22 @@ const StakeContainer = ({ price }: { price: string }) => {
           tokenProgram: TOKEN_PROGRAM_ID,
         },
       });
+      toast.custom(<YouAreStakingNotification sig={sig} />);
     } catch (err) {
+      toast.custom(<ErrorNotification />);
       console.log("Handle Anchor Error:", err);
     } finally {
       setTxFlowInProgress(false);
     }
+  };
+
+  const handleToast = () => {
+    const x = convertDecimalsToAmount(stepAmount);
+    console.log("lam", { x });
+
+    toast.custom(<ErrorNotification />, { duration: 2000 });
+    toast.custom(<ApproveFromWalletNotification />, { duration: 2000 });
+    toast.custom(<YouAreStakingNotification sig="123" />, { duration: 2000 });
   };
 
   useEffect(() => {
@@ -321,6 +352,11 @@ const StakeContainer = ({ price }: { price: string }) => {
       {/* Swap */}
       {connected ? (
         <div className="mt-4">
+          <AccountListener
+            onAccountChange={getTokensInfo}
+            stepAccount={stepToken?.pubkey}
+            xStepAccount={xStepToken?.pubkey}
+          />
           <StakeHeaderAndDescription />
           <div className="mt-[20px] w-[450px]">
             <Tab.Group selectedIndex={selectedTabIndex}>
@@ -410,6 +446,7 @@ const StakeContainer = ({ price }: { price: string }) => {
               textType={buttonType}
               onClick={() => {
                 void handleAnchor();
+                // handleToast();
                 console.log("stake");
               }}
             />

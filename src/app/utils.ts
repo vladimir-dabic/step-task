@@ -65,7 +65,25 @@ const convertToRegularNum = (
   return new BigNumber(num).toFixed(decimals).replace(/\.?0+$/, "");
 };
 
+/**
+ * Converts an amount represented as a string, number, or BigNumber from decimal to token format.
+ *
+ * @param input - The decimal value to convert.
+ * @param decimals - The number of decimal places used in the input value.
+ * @returns The converted value as a string.
+ */
+const convertDecimalsToAmount = (
+  input: string | number | BigNumber,
+  decimals = STEP_DECIMALS,
+) => {
+  const powerOfTen = new BigNumber(10).pow(decimals);
+  return new BigNumber(input)
+    .times(powerOfTen)
+    .toFixed(0, BigNumber.ROUND_FLOOR);
+};
+
 export {
+  convertDecimalsToAmount,
   hasValidDecimals,
   isValidPositiveNumber,
   resolveAmountInput,
