@@ -56,16 +56,18 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
     <ConnectionProvider endpoint={env.NEXT_PUBLIC_SOLANA_RPC_URL}>
       <WalletProvider wallets={wallets} autoConnect={autoConnect}>
         <WalletModalProvider>
-          <nav className="flex justify-between p-5">
-            <Image
-              src={stepLogoImgUrl}
-              alt="Step finance name and logo"
-              width={110}
-              height={40}
-            />
-            <WalletMultiButton />
-          </nav>
-          {children}
+          <section className="flex h-screen flex-col">
+            <header className="fixed flex w-full justify-between p-5">
+              <Image
+                src={stepLogoImgUrl}
+                alt="Step finance name and logo"
+                width={110}
+                height={40}
+              />
+              <WalletMultiButton />
+            </header>
+            {children}
+          </section>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

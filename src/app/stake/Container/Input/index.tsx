@@ -20,7 +20,7 @@ type Props = {
   onMaxClick?: MouseEventHandler<HTMLButtonElement>;
 };
 
-const SwapInput = ({
+const StakeInput = ({
   tokenName,
   tokenUrl,
   label,
@@ -51,7 +51,7 @@ const SwapInput = ({
       <div className="flex h-[64px] w-full items-center rounded-md bg-black p-3">
         <div className="flex items-center">
           <Image src={tokenUrl} alt="step token" height={30} width={30} />
-          <span className="ml-2 mr-2">{tokenName}</span>
+          <span className="ml-2 mr-2 text-sm font-semibold">{tokenName}</span>
         </div>
         <div className="flex flex-grow">
           <div className="flex w-full flex-col items-center">
@@ -90,4 +90,4 @@ const SwapInput = ({
   );
 };
 
-export default SwapInput;
+export default StakeInput;

@@ -1,5 +1,9 @@
 import React from "react";
 import { ContextProvider } from "../contexts";
+import Image from "next/image";
+import { stepLogoImgUrl } from "../constants";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { Toaster } from "react-hot-toast";
 
 export default function StakeLayout({
   children,
@@ -8,9 +12,24 @@ export default function StakeLayout({
 }) {
   return (
     <ContextProvider>
-      <main className="mb-10 flex flex-col items-center justify-start">
+      <main
+        className="
+        mt-[75px]
+        flex
+        h-screen
+        flex-col
+        items-center
+        justify-start
+        "
+      >
         {children}
       </main>
+      <Toaster
+        position="bottom-left"
+        toastOptions={{
+          duration: 6000,
+        }}
+      />
     </ContextProvider>
   );
 }
