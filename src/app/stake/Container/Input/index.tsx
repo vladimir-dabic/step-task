@@ -61,12 +61,15 @@ const SwapInput = ({
                 onChange={onChange}
                 className="
                   placeholder:text-step-label
+                  selection:bg-step-dimmedAccent
                   ml-2
                   h-[28px]
                   w-full
                   bg-black
                   text-right
                   font-mono
+                  text-[18px]
+                  font-medium
                   focus:bg-none
                   focus:outline-none
                   "
