@@ -318,19 +318,19 @@ const StakeContainer = ({ price }: { price: string }) => {
                 <Tab.Panel>
                   <SwapInput
                     tokenName="xSTEP"
-                    amount={stepAmount}
+                    amount={xStepAmount}
                     price={price}
                     tokenUrl={xStepTokenImgUrl}
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
-                    onChange={(event) => handleAmountChange(event, "step")}
+                    onChange={(event) => handleAmountChange(event, "xstep")}
                     onHalfClick={() => handleHalfClick("step")}
                     onMaxClick={() => handleMaxClick("step")}
                   />
                   <ArrowSeparator />
                   <SwapInput
                     tokenName="STEP"
-                    amount={xStepAmount}
+                    amount={stepAmount}
                     price={price}
                     tokenUrl={stepTokenImgUrl}
                     label="You stake"
