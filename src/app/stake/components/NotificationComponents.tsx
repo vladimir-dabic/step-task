@@ -7,7 +7,11 @@ import {
   MinusIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
-import { stepTokenImgUrl, xStepTokenImgUrl } from "~/app/constants";
+import {
+  stepLogoImgUrl,
+  stepTokenImgUrl,
+  xStepTokenImgUrl,
+} from "~/app/constants";
 import Image from "next/image";
 
 type TemplateProps = {
@@ -162,14 +166,14 @@ const SuccessStakingNotification = ({
       text="You stake:"
       amount={minusAmount}
       Icon={<MinusIcon {...defaultIconSize} className="fill-step-accent" />}
-      imageUrl={xStepTokenImgUrl}
+      imageUrl={stepTokenImgUrl}
       thicker="STEP"
     />
     <StakedDataRow
       text="You received:"
       amount={plusAmount}
       Icon={<PlusIcon {...defaultIconSize} className="fill-step-accent" />}
-      imageUrl={stepTokenImgUrl}
+      imageUrl={xStepTokenImgUrl}
       thicker="xSTEP"
     />
   </NotificationTemplate>
@@ -185,15 +189,15 @@ const SuccessUnstakingNotification = ({
       text="You unstaked:"
       amount={minusAmount}
       Icon={<MinusIcon {...defaultIconSize} className="fill-step-accent" />}
-      imageUrl={stepTokenImgUrl}
-      thicker="STEP"
+      imageUrl={xStepTokenImgUrl}
+      thicker="xSTEP"
     />
     <StakedDataRow
       text="You received:"
       amount={plusAmount}
       Icon={<PlusIcon {...defaultIconSize} className="fill-step-accent" />}
-      imageUrl={xStepTokenImgUrl}
-      thicker="xSTEP"
+      imageUrl={stepTokenImgUrl}
+      thicker="STEP"
     />
   </NotificationTemplate>
 );
