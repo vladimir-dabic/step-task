@@ -1,8 +1,4 @@
-import React, {
-  JSXElementConstructor,
-  MouseEventHandler,
-  ReactNode,
-} from "react";
+import React, { type ReactNode } from "react";
 import {
   XCircleIcon,
   ArrowTopRightOnSquareIcon,
@@ -30,15 +26,14 @@ const NotificationTemplate = ({
   title,
   children,
   type,
-  // LeftIcon,
-  sig, // onViewOnSolscanClick,
+  sig,
 }: TemplateProps) => {
   return (
     <div
       className="
-        bg-step-paper
         min-w-[384px]
         rounded-lg
+        bg-step-paper
         p-[20px]
         shadow-lg
         "
@@ -65,21 +60,20 @@ const NotificationTemplate = ({
         <div className="flex w-full flex-col justify-between gap-3">
           <span className="w-full font-bold">{title}</span>
           {children}
-          {/* <span className="text-step-label">Transaction rejected</span> */}
           {sig && (
             <div className="flex justify-end ">
               <button
                 className="
-                border-step-disabled
                 flex
                 items-center
                 gap-3
                 border
+                border-step-disabled
                 p-1
                 px-3
                 "
               >
-                <span className="text-step-accent text-sm font-thin">
+                <span className="text-sm font-thin text-step-accent">
                   <a
                     target="_blank"
                     href={`https://explorer.solana.com/tx/${sig}`}
@@ -103,7 +97,7 @@ const NotificationTemplate = ({
 
 const ErrorNotification = () => (
   <NotificationTemplate title="Transaction rejected" type="error">
-    <span className="text-step-label text-sm">Transaction rejected</span>
+    <span className="text-sm text-step-label">Transaction rejected</span>
   </NotificationTemplate>
 );
 
@@ -122,11 +116,9 @@ const YouAreStakingNotification = ({
   text: string;
 }) => (
   <NotificationTemplate title={text} type="progress" sig={sig}>
-    <span className="text-step-label text-sm">Confirmation is in progress</span>
+    <span className="text-sm text-step-label">Confirmation is in progress</span>
   </NotificationTemplate>
 );
-
-/* ************ SUCCESS COMPONENT ************ */
 
 type StakedDataRowProps = {
   text: string;
@@ -144,8 +136,8 @@ const StakedDataRow = ({
   text,
 }: StakedDataRowProps) => (
   <div className="mb-3 mt-3 flex flex-col gap-5">
-    <span className="text-step-label text-sm">{text}</span>
-    <div className="text-step-label flex gap-3">
+    <span className="text-sm text-step-label">{text}</span>
+    <div className="flex gap-3 text-step-label">
       {Icon}
       <Image src={imageUrl} alt="step token" height={30} width={30} />
       <span>{amount}</span>

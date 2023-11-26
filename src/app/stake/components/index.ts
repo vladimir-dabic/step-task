@@ -7,3 +7,11 @@ export {
   StakeDownArrow,
   UnstakeUpArrow,
 } from "./SvgComponents";
+
+export {
+  ApproveFromWalletNotification,
+  ErrorNotification,
+  SuccessStakingNotification,
+  SuccessUnstakingNotification,
+  YouAreStakingNotification,
+} from "./NotificationComponents";
