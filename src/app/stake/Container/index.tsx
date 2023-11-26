@@ -18,7 +18,6 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { type AccountInfo, type TokenAmount, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { toast } from "react-hot-toast";
-import Image from "next/image";
 import {
   type Idl,
   type Provider,
@@ -34,7 +33,6 @@ import {
   STEP_DECIMALS,
   STEP_MINT_PUBKEY,
   XSTEP_MINT_PUBKEY,
-  stepChartImgUrl,
   stepTokenImgUrl,
   xStepTokenImgUrl,
 } from "~/app/constants";
@@ -51,18 +49,17 @@ import {
   UnstakeUpArrow,
   ArrowSeparator,
   TabButton,
-} from "../components";
-import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
-
-import idl from "~/app/step_staking.json";
-import {
   ApproveFromWalletNotification,
   ErrorNotification,
   SuccessStakingNotification,
   SuccessUnstakingNotification,
   YouAreStakingNotification,
-} from "../components/NotificationComponents";
+} from "../components";
+import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
+
+import idl from "~/app/step_staking.json";
 import AccountListener from "./AccountListener";
+import StepLoader from "./StepLoader";
 
 type StepLookupType = "step" | "xstep";
 
@@ -76,7 +73,7 @@ const stepMintPubkey = new PublicKey(STEP_MINT_PUBKEY);
 const xStepMintPubkey = new PublicKey(XSTEP_MINT_PUBKEY);
 
 const StakeContainer = ({ price }: { price: string }) => {
-  const { connected, publicKey } = useWallet();
+  const { connected, publicKey, connecting } = useWallet();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
@@ -517,19 +514,7 @@ const StakeContainer = ({ price }: { price: string }) => {
           </div>
         </div>
       ) : (
-        // TODO:
-        /* Placeholder */
-        <div className="flex h-[60vh] flex-col justify-center">
-          <div className="flex flex-col items-center">
-            <Image
-              src={stepChartImgUrl}
-              alt="Step finance logo"
-              width={140}
-              height={40}
-            />
-            <span className="mt-2 text-2xl">Please connect wallet!</span>
-          </div>
-        </div>
+        <StepLoader connecting={connecting} />
       )}
     </div>
   );
