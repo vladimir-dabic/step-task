@@ -2,6 +2,7 @@ import React, {
   useMemo,
   type ChangeEventHandler,
   type MouseEventHandler,
+  type FocusEventHandler,
 } from "react";
 import Image from "next/image";
 import BigNumber from "bignumber.js";
@@ -15,6 +16,7 @@ type Props = {
   balance: number | null | undefined;
   amount: string;
   price: string;
+  onBlur: FocusEventHandler<HTMLInputElement>;
   onChange: ChangeEventHandler<HTMLInputElement>;
   onHalfClick?: MouseEventHandler<HTMLButtonElement>;
   onMaxClick?: MouseEventHandler<HTMLButtonElement>;
@@ -30,6 +32,7 @@ const StakeInput = ({
   onHalfClick,
   onMaxClick,
   onChange,
+  onBlur,
 }: Props) => {
   const calculatedValue = useMemo(() => {
     const result = new BigNumber(price).times(amount).toFixed(2);
@@ -41,7 +44,7 @@ const StakeInput = ({
       <div className="mb-3 flex justify-between">
         <span className="text-sm">{label}</span>
         <div className="flex gap-1">
-          <span className="text-step-label text-sm">
+          <span className="text-sm text-step-label">
             Balance: <span className="font-mono">{balance ?? 0}</span>
           </span>
           {onHalfClick && <HalfMaxButton text="HALF" onClick={onHalfClick} />}
@@ -57,11 +60,10 @@ const StakeInput = ({
           <div className="flex w-full flex-col items-center">
             <div className="flex w-full">
               <input
+                onBlur={onBlur}
                 value={amount}
                 onChange={onChange}
                 className="
-                  placeholder:text-step-label
-                  selection:bg-step-dimmedAccent
                   ml-2
                   h-[28px]
                   w-full
@@ -69,7 +71,9 @@ const StakeInput = ({
                   text-right
                   font-mono
                   text-[18px]
-                  font-medium
+                  font-bold
+                  selection:bg-step-dimmedAccent
+                  placeholder:text-step-label
                   focus:bg-none
                   focus:outline-none
                   "
@@ -78,7 +82,7 @@ const StakeInput = ({
             </div>
             {+amount ? (
               <div className="flex w-full justify-end text-[12px] ">
-                <span className="text-step-label font-mono">
+                <span className="font-mono text-step-label">
                   {calculatedValue}
                 </span>
               </div>

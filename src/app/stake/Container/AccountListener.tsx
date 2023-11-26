@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { AccountChangeCallback, PublicKey } from "@solana/web3.js";
+import { type AccountChangeCallback, type PublicKey } from "@solana/web3.js";
 
 type Props = {
   onAccountChange: AccountChangeCallback;
@@ -8,11 +8,7 @@ type Props = {
   xStepAccount: PublicKey | undefined;
 };
 
-const AccountListener = ({
-  onAccountChange,
-  stepAccount,
-  xStepAccount,
-}: Props) => {
+const AccountListener = ({ onAccountChange, stepAccount }: Props) => {
   const { connection } = useConnection();
 
   /* Step streaming */
@@ -27,9 +23,9 @@ const AccountListener = ({
     }
 
     return () => {
-      if (id) connection.removeAccountChangeListener(id);
+      if (id) void connection.removeAccountChangeListener(id);
     };
-  }, [stepAccount]);
+  }, [connection, onAccountChange, stepAccount]);
 
   return null;
 };

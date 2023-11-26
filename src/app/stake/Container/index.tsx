@@ -2,6 +2,7 @@
 
 import React, {
   type ChangeEvent,
+  type FocusEvent,
   useEffect,
   useState,
   useMemo,
@@ -260,6 +261,23 @@ const StakeContainer = ({ price }: { price: string }) => {
     }
   };
 
+  const handleOnBlurAmount = (
+    event: FocusEvent<HTMLInputElement>,
+    type: "step" | "xstep",
+  ) => {
+    const { value } = event.target;
+
+    if (!value) return;
+
+    if (type === "step") {
+      setStepAmount(convertToRegularNum(value));
+    }
+
+    if (type === "xstep") {
+      setXstepAmount(convertToRegularNum(value));
+    }
+  };
+
   const handleHalfMaxClick = (
     type: StepLookupType,
     divideType: "half" | "max",
@@ -301,6 +319,7 @@ const StakeContainer = ({ price }: { price: string }) => {
 
     try {
       /* @ts-expect-error  because! :D */
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const sig = await program.rpc.stake(vaultBump, txAmount, {
         accounts: {
           tokenMint: stepMintPubkey,
@@ -334,6 +353,7 @@ const StakeContainer = ({ price }: { price: string }) => {
     const toastId = toast.custom(<ApproveFromWalletNotification />);
     try {
       /* @ts-expect-error  because! :D */
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const sig = await program.rpc.unstake(vaultBump, txAmount, {
         accounts: {
           tokenMint: stepMintPubkey,
@@ -348,7 +368,7 @@ const StakeContainer = ({ price }: { price: string }) => {
 
       setSignature(sig);
       toast.custom(
-        <YouAreStakingNotification sig={sig} text="You are unstaking" />,
+        <YouAreStakingNotification sig={sig} text="You are unstaking xSTEP" />,
       );
     } catch (err) {
       toast.custom(<ErrorNotification />);
@@ -374,8 +394,7 @@ const StakeContainer = ({ price }: { price: string }) => {
         <div className="mt-4">
           {txFlowInProgress && signature && (
             <AccountListener
-              onAccountChange={(ac) => {
-                console.log("on change", { ac, signature });
+              onAccountChange={() => {
                 toast.custom(
                   selectedTabIndex ? (
                     <SuccessUnstakingNotification
@@ -391,7 +410,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     />
                   ),
                 ),
-                  getTokensInfo();
+                  void getTokensInfo();
                 setTxFlowInProgress(false);
               }}
               stepAccount={stepToken?.pubkey}
@@ -402,7 +421,7 @@ const StakeContainer = ({ price }: { price: string }) => {
           <div className="mt-[20px] w-[450px]">
             <Tab.Group selectedIndex={selectedTabIndex}>
               <Tab.List>
-                {/* @ts-ignore */}
+                {/* @ts-expect-error because of fragment*/}
                 <Tab as={Fragment} disabled={txFlowInProgress}>
                   {({ selected }) => (
                     <TabButton
@@ -413,7 +432,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     />
                   )}
                 </Tab>
-                {/* @ts-ignore */}
+                {/* @ts-expect-error because of fragment*/}
                 <Tab as={Fragment} disabled={txFlowInProgress}>
                   {({ selected }) => (
                     <TabButton
@@ -427,11 +446,11 @@ const StakeContainer = ({ price }: { price: string }) => {
               </Tab.List>
               <Tab.Panels
                 className="
-                  bg-step-paper
                   focus
                   rounded-bl-lg
                   rounded-br-lg
                   rounded-tr-lg
+                  bg-step-paper
                   p-5
                   "
               >
@@ -447,6 +466,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     onChange={(event) => handleAmountChange(event, "step")}
                     onHalfClick={() => handleHalfMaxClick("step", "half")}
                     onMaxClick={() => handleHalfMaxClick("step", "max")}
+                    onBlur={(event) => handleOnBlurAmount(event, "step")}
                   />
                   <ArrowSeparator />
                   <StakeInput
@@ -457,6 +477,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     label="You stake"
                     balance={xStepBalance?.uiAmount}
                     onChange={(event) => handleAmountChange(event, "xstep")}
+                    onBlur={(event) => handleOnBlurAmount(event, "xstep")}
                   />
                 </Tab.Panel>
                 {/* UNSTAKE */}
@@ -471,6 +492,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     onChange={(event) => handleAmountChange(event, "xstep")}
                     onHalfClick={() => handleHalfMaxClick("xstep", "half")}
                     onMaxClick={() => handleHalfMaxClick("xstep", "max")}
+                    onBlur={(event) => handleOnBlurAmount(event, "xstep")}
                   />
                   <ArrowSeparator />
                   <StakeInput
@@ -481,6 +503,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     label="You stake"
                     balance={stepBalance?.uiAmount}
                     onChange={(event) => handleAmountChange(event, "step")}
+                    onBlur={(event) => handleOnBlurAmount(event, "step")}
                   />
                 </Tab.Panel>
               </Tab.Panels>
@@ -494,6 +517,7 @@ const StakeContainer = ({ price }: { price: string }) => {
           </div>
         </div>
       ) : (
+        // TODO:
         /* Placeholder */
         <div className="flex h-[60vh] flex-col justify-center">
           <div className="flex flex-col items-center">
