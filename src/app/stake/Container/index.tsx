@@ -19,6 +19,7 @@ import { BN } from "@coral-xyz/anchor";
 import {
   STEP_DECIMALS,
   STEP_MINT_PUBKEY,
+  WAIT_FOR_CONFIRMATION_UNTIL_ENABLED,
   XSTEP_MINT_PUBKEY,
   stepTokenImgUrl,
   xStepTokenImgUrl,
@@ -204,8 +205,6 @@ const StakeContainer = ({ price }: { price: string }) => {
   };
 
   const handleStake = async () => {
-    console.log("ovde de", { program });
-
     if (!wallet || !program || !stepToken || !xStepToken) return;
 
     const targetAmount = convertDecimalsToAmount(stepAmount);
@@ -233,6 +232,10 @@ const StakeContainer = ({ price }: { price: string }) => {
       toast.custom(
         <YouAreStakingNotification sig={sig} text="You are staking STEP" />,
       );
+      /* Just in case :) */
+      setTimeout(() => {
+        setTxFlowInProgress(false);
+      }, WAIT_FOR_CONFIRMATION_UNTIL_ENABLED);
     } catch (err) {
       toast.custom(<ErrorNotification />);
       setTxFlowInProgress(false);
@@ -268,6 +271,10 @@ const StakeContainer = ({ price }: { price: string }) => {
       toast.custom(
         <YouAreStakingNotification sig={sig} text="You are unstaking xSTEP" />,
       );
+      /* Just in case :) */
+      setTimeout(() => {
+        setTxFlowInProgress(false);
+      }, WAIT_FOR_CONFIRMATION_UNTIL_ENABLED);
     } catch (err) {
       toast.custom(<ErrorNotification />);
       setTxFlowInProgress(false);

@@ -1,4 +1,4 @@
-import { AccountInfo, PublicKey } from "@solana/web3.js";
+import { type AccountInfo, type PublicKey } from "@solana/web3.js";
 
 export interface IParsedAccountData {
   parsed: Parsed;

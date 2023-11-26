@@ -7,11 +7,7 @@ import {
   MinusIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
-import {
-  stepLogoImgUrl,
-  stepTokenImgUrl,
-  xStepTokenImgUrl,
-} from "~/app/constants";
+import { stepTokenImgUrl, xStepTokenImgUrl } from "~/app/constants";
 import Image from "next/image";
 
 type TemplateProps = {
