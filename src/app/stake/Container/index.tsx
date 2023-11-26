@@ -9,25 +9,12 @@ import React, {
   Fragment,
 } from "react";
 import { Tab } from "@headlessui/react";
-import {
-  useConnection,
-  useWallet,
-  useAnchorWallet,
-} from "@solana/wallet-adapter-react";
+import { useWallet, useAnchorWallet } from "@solana/wallet-adapter-react";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { type AccountInfo, type TokenAmount, PublicKey } from "@solana/web3.js";
+import { type TokenAmount, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { toast } from "react-hot-toast";
-import {
-  type Idl,
-  type Provider,
-  AnchorProvider,
-  Program,
-  BN,
-  setProvider,
-  web3,
-  getProvider,
-} from "@coral-xyz/anchor";
+import { BN } from "@coral-xyz/anchor";
 
 import {
   STEP_DECIMALS,
@@ -41,8 +28,7 @@ import {
   convertToRegularNum,
   resolveAmountInput,
 } from "~/app/utils";
-import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
-import idl from "~/app/idl/step_staking.json";
+import { type StakeButtonTextType } from "~/app/types";
 
 import StakeInput from "./Input";
 import {
@@ -61,36 +47,27 @@ import {
 
 import AccountListener from "./AccountListener";
 import StepLoader from "./StepLoader";
+import { useAnchorData } from "~/app/hooks/useAnchorData";
+import { useTokensData } from "~/app/hooks/useTokensData";
 
 type StepLookupType = "step" | "xstep";
 
-type RpcTokensResponse = {
-  pubkey: PublicKey;
-  account: AccountInfo<IParsedAccountData>;
-};
-
-const programId = new PublicKey("Stk5NCWomVN3itaFjLu382u9ibb5jMSHEsh6CuhaGjB");
 const stepMintPubkey = new PublicKey(STEP_MINT_PUBKEY);
 const xStepMintPubkey = new PublicKey(XSTEP_MINT_PUBKEY);
 
 const StakeContainer = ({ price }: { price: string }) => {
   const { connected, publicKey, connecting } = useWallet();
-  const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
-  const [stepToken, setStepToken] = useState<RpcTokensResponse | undefined>();
-  const [xStepToken, setXstepToken] = useState<RpcTokensResponse | undefined>();
   const [stepAmount, setStepAmount] = useState("");
-  const [stepPerXstepRatio, setStepPerXstepRatio] = useState<string>();
   const [xStepAmount, setXstepAmount] = useState("");
-  const [xPrice, setXPrice] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [txFlowInProgress, setTxFlowInProgress] = useState(false);
-  /* Program state */
   const [signature, setSignature] = useState("");
-  const [program, setProgram] = useState<Program<Idl>>();
-  const [vaultPubkey, setVaultPubkey] = useState<PublicKey>();
-  const [vaultBump, setVaultBump] = useState<number>();
+
+  const { stepToken, xStepToken, getTokensInfo } = useTokensData();
+  const { program, stepPerXstepRatio, vaultBump, vaultPubkey, xPrice } =
+    useAnchorData({ price });
 
   const stepBalance = useMemo<TokenAmount | undefined>(
     () => stepToken?.account.data.parsed.info.tokenAmount,
@@ -142,88 +119,6 @@ const StakeContainer = ({ price }: { price: string }) => {
   const balanceLookup = {
     step: stepBalance,
     xstep: xStepBalance,
-  };
-
-  const getTokensInfo = async () => {
-    if (!publicKey) return;
-
-    try {
-      const accounts = (await connection.getParsedProgramAccounts(
-        TOKEN_PROGRAM_ID,
-        {
-          filters: [
-            {
-              dataSize: 165, // number of bytes
-            },
-            {
-              memcmp: {
-                offset: 32, // number of bytes
-                bytes: publicKey?.toBase58(),
-              },
-            },
-          ],
-        },
-      )) as RpcTokensResponse[];
-
-      const step = accounts.find(
-        (item) => item.account.data.parsed.info.mint === STEP_MINT_PUBKEY,
-      );
-
-      if (step) setStepToken(step);
-
-      const xStep = accounts.find(
-        (item) => item.account.data.parsed.info.mint === XSTEP_MINT_PUBKEY,
-      );
-
-      if (xStep) setXstepToken(xStep);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const setupAnchorAndEmitPrice = async () => {
-    if (!wallet) return;
-
-    let provider: Provider;
-    try {
-      provider = getProvider();
-    } catch {
-      provider = new AnchorProvider(connection, wallet, {
-        commitment: "processed",
-      });
-      setProvider(provider);
-    }
-
-    const program = new Program(idl as Idl, programId);
-    setProgram(program);
-
-    // TODO: fix deprecated
-    try {
-      const [_vaultPubkey, _vaultBump] =
-        await web3.PublicKey.findProgramAddress(
-          [stepMintPubkey.toBuffer()],
-          program.programId,
-        );
-      setVaultPubkey(_vaultPubkey);
-      setVaultBump(_vaultBump);
-
-      /* @ts-expect-error  because! :D */
-      const res = await program.simulate.emitPrice({
-        accounts: {
-          tokenMint: stepMintPubkey,
-          xTokenMint: xStepMintPubkey,
-          tokenVault: _vaultPubkey,
-        },
-      });
-      if (res) {
-        const ratio = res.events[0]?.data.stepPerXstep as string;
-        setStepPerXstepRatio(ratio);
-        const _xPrice = new BigNumber(price).times(ratio).toString();
-        setXPrice(_xPrice);
-      }
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   const handleAmountChange = (
@@ -309,6 +204,8 @@ const StakeContainer = ({ price }: { price: string }) => {
   };
 
   const handleStake = async () => {
+    console.log("ovde de", { program });
+
     if (!wallet || !program || !stepToken || !xStepToken) return;
 
     const targetAmount = convertDecimalsToAmount(stepAmount);
@@ -383,8 +280,6 @@ const StakeContainer = ({ price }: { price: string }) => {
     if (!wallet || !publicKey) return;
 
     void getTokensInfo();
-
-    void setupAnchorAndEmitPrice();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey]);

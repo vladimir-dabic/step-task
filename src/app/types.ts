@@ -1,3 +1,5 @@
+import { AccountInfo, PublicKey } from "@solana/web3.js";
+
 export interface IParsedAccountData {
   parsed: Parsed;
   program: string;
@@ -60,3 +62,8 @@ export type StakeButtonTextType =
   | "approveFromWallet"
   | "stake"
   | "unstake";
+
+export type RpcTokensResponse = {
+  pubkey: PublicKey;
+  account: AccountInfo<IParsedAccountData>;
+};

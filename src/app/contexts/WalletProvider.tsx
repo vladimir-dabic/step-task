@@ -8,7 +8,6 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
-  UnsafeBurnerWalletAdapter,
   SolflareWalletAdapter,
   LedgerWalletAdapter,
   TorusWalletAdapter,
