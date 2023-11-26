@@ -41,6 +41,9 @@ import {
   convertToRegularNum,
   resolveAmountInput,
 } from "~/app/utils";
+import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
+import idl from "~/app/idl/step_staking.json";
+
 import StakeInput from "./Input";
 import {
   StakeHeaderAndDescription,
@@ -55,9 +58,7 @@ import {
   SuccessUnstakingNotification,
   YouAreStakingNotification,
 } from "../components";
-import { type IParsedAccountData, type StakeButtonTextType } from "~/app/types";
 
-import idl from "~/app/step_staking.json";
 import AccountListener from "./AccountListener";
 import StepLoader from "./StepLoader";
 
@@ -187,7 +188,9 @@ const StakeContainer = ({ price }: { price: string }) => {
     try {
       provider = getProvider();
     } catch {
-      provider = new AnchorProvider(connection, wallet, {});
+      provider = new AnchorProvider(connection, wallet, {
+        commitment: "processed",
+      });
       setProvider(provider);
     }
 
@@ -260,7 +263,7 @@ const StakeContainer = ({ price }: { price: string }) => {
 
   const handleOnBlurAmount = (
     event: FocusEvent<HTMLInputElement>,
-    type: "step" | "xstep",
+    type: StepLookupType,
   ) => {
     const { value } = event.target;
 
@@ -335,6 +338,7 @@ const StakeContainer = ({ price }: { price: string }) => {
       );
     } catch (err) {
       toast.custom(<ErrorNotification />);
+      setTxFlowInProgress(false);
     } finally {
       toast.dismiss(toastId);
     }
@@ -369,6 +373,7 @@ const StakeContainer = ({ price }: { price: string }) => {
       );
     } catch (err) {
       toast.custom(<ErrorNotification />);
+      setTxFlowInProgress(false);
     } finally {
       toast.dismiss(toastId);
     }
@@ -390,7 +395,7 @@ const StakeContainer = ({ price }: { price: string }) => {
         <div className="mt-4">
           {txFlowInProgress && signature && (
             <AccountListener
-              onAccountChange={() => {
+              onAccountChangeConfirmed={() => {
                 toast.custom(
                   selectedTabIndex ? (
                     <SuccessUnstakingNotification

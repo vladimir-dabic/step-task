@@ -24,7 +24,7 @@ export default function StakeLayout({
       <Toaster
         position="bottom-left"
         toastOptions={{
-          duration: 6000,
+          duration: 4000,
         }}
       />
     </ContextProvider>
