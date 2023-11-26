@@ -10,7 +10,7 @@ import {
 } from "@coral-xyz/anchor";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import idl from "../idl/step_staking.json";
+import idl from "~/app/Idls/step_staking.json";
 import { STEP_MINT_PUBKEY, XSTEP_MINT_PUBKEY } from "../constants";
 import BigNumber from "bignumber.js";
 
