@@ -34,7 +34,7 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
   const wallets = useMemo(
     () => [
       new SolflareWalletAdapter(),
-      new UnsafeBurnerWalletAdapter(),
+      // new UnsafeBurnerWalletAdapter(),
       new LedgerWalletAdapter(),
       new TorusWalletAdapter(),
       /*TODO: Install (no link) */

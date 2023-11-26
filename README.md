@@ -6,4 +6,4 @@ Create a Next.js application which allows a user to connect their Solana wallet 
 
 Goal is to match [Step Finance](https://app.step.finance/en/stake) page
 
-Deployment -> [Step Finance Coding Task](https://step-task-green.vercel.app/)
+[Step Finance Coding Task](https://step-task-green.vercel.app/)
