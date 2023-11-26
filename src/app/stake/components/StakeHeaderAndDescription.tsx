@@ -1,23 +1,19 @@
 import React from "react";
 import Image from "next/image";
 import { xStepTokenImgUrl } from "~/app/constants";
+import { UpDownArrow } from "./SvgComponents";
 
 const StakeHeaderAndDescription = () => {
   return (
     <>
-      <div className="mb-[30px] mt-[30px] flex justify-center">
-        <Image
-          src="/up-down-arrow-icon.svg"
-          width={32}
-          height={32}
-          alt="stake icon"
-        />
+      <div className="mb-[30px] mt-[30px] flex items-center justify-center">
+        <UpDownArrow />
         <span className="ml-5 text-[28px] font-semibold">Stake STEP</span>
       </div>
-      <div className="text-step-description mb-[36px] flex justify-center text-sm font-thin">
+      <div className="mb-[36px] flex justify-center text-sm font-thin text-step-description">
         Stake STEP to receive xSTEP
       </div>
-      <div className="bg-step-paper w-[450px] rounded-lg p-[30px]">
+      <div className="w-[450px] rounded-lg bg-step-paper p-[30px]">
         <div className="flex justify-between">
           <div className="flex">
             <Image
@@ -32,7 +28,7 @@ const StakeHeaderAndDescription = () => {
         </div>
         <div className="mt-[32px]">
           <p className="mb-[10px] text-sm font-bold">{`"Where is my staking reward?"`}</p>
-          <p className="text-step-description text-sm font-extralight leading-[25px]">
+          <p className="text-sm font-extralight leading-[25px] text-step-description">
             {`xSTEP is a yield bearing asset. This means it is automatically worth
             more STEP over time. You don't need to claim any rewards, or do
             anything other than hold your xSTEP to benefit from this. Later,

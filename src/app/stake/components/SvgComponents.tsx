@@ -46,6 +46,29 @@ const StakeDownArrow: React.FC<SvgComponentProps> = ({
   </svg>
 );
 
+const UpDownArrow: React.FC<SvgComponentProps> = ({ ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={32}
+    height={32}
+    fill="none"
+    {...props}
+  >
+    <path
+      fill="#fff"
+      fillRule="evenodd"
+      d="M4.8 27.2a1.6 1.6 0 0 1 1.6-1.6h19.2a1.6 1.6 0 0 1 0 3.2H6.4a1.6 1.6 0 0 1-1.6-1.6Zm5.269-12.331a1.6 1.6 0 0 1 2.262 0l2.069 2.069V4.8a1.6 1.6 0 0 1 3.2 0v12.138l2.069-2.07a1.598 1.598 0 0 1 2.631.506 1.598 1.598 0 0 1-.369 1.757l-4.8 4.8a1.6 1.6 0 0 1-2.262 0l-4.8-4.8a1.6 1.6 0 0 1 0-2.262Z"
+      clipRule="evenodd"
+    />
+    <path
+      fill="#fff"
+      fillRule="evenodd"
+      d="M4.8 27.2a1.6 1.6 0 0 1 1.6-1.6h19.2a1.6 1.6 0 0 1 0 3.2H6.4a1.6 1.6 0 0 1-1.6-1.6Zm5.269-16.469a1.6 1.6 0 0 1 0-2.262l4.8-4.8a1.6 1.6 0 0 1 2.262 0l4.8 4.8a1.6 1.6 0 0 1-2.262 2.262l-2.07-2.069V20.8a1.6 1.6 0 0 1-3.2 0V8.662l-2.068 2.07a1.6 1.6 0 0 1-2.262 0Z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
+
 const ArrowSeparator = () => (
   <div className="my-3 flex justify-center">
     <svg
@@ -65,4 +88,4 @@ const ArrowSeparator = () => (
   </div>
 );
 
-export { UnstakeUpArrow, StakeDownArrow, ArrowSeparator };
+export { UnstakeUpArrow, StakeDownArrow, ArrowSeparator, UpDownArrow };

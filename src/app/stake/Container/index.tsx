@@ -385,8 +385,7 @@ const StakeContainer = ({ price }: { price: string }) => {
   }, [publicKey]);
 
   return (
-    <div className="">
-      {/* Swap */}
+    <div>
       {connected ? (
         <div className="mt-4">
           {txFlowInProgress && signature && (
