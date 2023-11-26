@@ -1,8 +1,5 @@
 import React from "react";
 import { ContextProvider } from "../contexts";
-import Image from "next/image";
-import { stepLogoImgUrl } from "../constants";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Toaster } from "react-hot-toast";
 
 export default function StakeLayout({

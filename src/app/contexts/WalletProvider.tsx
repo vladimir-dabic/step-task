@@ -7,7 +7,6 @@ import {
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { clusterApiUrl } from "@solana/web3.js";
 import {
   UnsafeBurnerWalletAdapter,
   SolflareWalletAdapter,
@@ -27,15 +26,10 @@ import { AutoConnectProvider, useAutoConnect } from "./AutoConnectProvider";
 import { stepLogoImgUrl } from "../constants";
 import "./layout.css";
 
-// require("@solana/wallet-adapter-react-ui/styles.css");
-
 const WalletContextProvider = ({ children }: { children: ReactNode }) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
   const network = WalletAdapterNetwork.Mainnet;
   const { autoConnect } = useAutoConnect();
-
-  // You can also provide a custom RPC endpoint.
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
     () => [
