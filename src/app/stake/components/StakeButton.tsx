@@ -11,6 +11,7 @@ const lookupText = {
   insufficientXstep: "Insufficient xSTEP balance",
   enterAmount: "Enter an amount",
   stake: "Stake",
+  unstake: "Unstake",
   approveFromWallet: "Approve transactions from your wallet",
 };
 
@@ -18,7 +19,7 @@ const StakeButton = ({ textType, onClick }: Props) => {
   return (
     <button
       onClick={onClick}
-      disabled={textType !== "stake"}
+      disabled={!textType.endsWith("stake")}
       className="
       disabled:bg-step-disabled
       disabled:text-step-description

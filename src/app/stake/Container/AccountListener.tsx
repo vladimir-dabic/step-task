@@ -19,25 +19,17 @@ const AccountListener = ({
   useEffect(() => {
     let id: number;
     if (stepAccount) {
-      id = connection.onAccountChange(stepAccount, onAccountChange);
+      id = connection.onAccountChange(
+        stepAccount,
+        onAccountChange,
+        "finalized",
+      );
     }
 
     return () => {
-      connection.removeAccountChangeListener(id);
+      if (id) connection.removeAccountChangeListener(id);
     };
   }, [stepAccount]);
-
-  /* xStep streaming */
-  // useEffect(() => {
-  //   let id: number;
-  //   if (xStepAccount) {
-  //     id = connection.onAccountChange(xStepAccount, onAccountChange);
-  //   }
-
-  //   return () => {
-  //     connection.removeAccountChangeListener(id);
-  //   };
-  // }, [stepAccount]);
 
   return null;
 };

@@ -58,4 +58,5 @@ export type StakeButtonTextType =
   | "insufficientXstep"
   | "enterAmount"
   | "approveFromWallet"
-  | "stake";
+  | "stake"
+  | "unstake";

@@ -1,11 +1,18 @@
-import React, { MouseEventHandler, ReactNode } from "react";
+import React, {
+  JSXElementConstructor,
+  MouseEventHandler,
+  ReactNode,
+} from "react";
 import {
   XCircleIcon,
   ArrowTopRightOnSquareIcon,
   CheckCircleIcon,
   EllipsisHorizontalIcon,
+  MinusIcon,
+  PlusIcon,
 } from "@heroicons/react/24/solid";
-import Link from "next/link";
+import { stepTokenImgUrl, xStepTokenImgUrl } from "~/app/constants";
+import Image from "next/image";
 
 type TemplateProps = {
   title: string;
@@ -14,9 +21,9 @@ type TemplateProps = {
   sig?: string;
 };
 
-const IconOptions = {
-  height: 34,
-  width: 34,
+const defaultIconSize = {
+  height: 22,
+  width: 22,
 };
 
 const NotificationTemplate = ({
@@ -37,22 +44,21 @@ const NotificationTemplate = ({
         "
     >
       <div className="flex h-full">
-        <div className="flex items-center">
+        <div className="mr-5 flex items-center">
           {type === "error" && (
-            <XCircleIcon width={22} height={22} className="mr-4 fill-red-500" />
+            <XCircleIcon {...defaultIconSize} className="fill-red-500" />
           )}
           {type === "success" && (
             <CheckCircleIcon
-              width={22}
-              height={22}
-              className="mr-4 fill-green-500"
+              {...defaultIconSize}
+              className="fill-step-accent"
             />
           )}
           {(type === "progress" || type === "info") && (
             <EllipsisHorizontalIcon
               width={32}
               height={32}
-              className="mr-4 fill-blue-500"
+              className="fill-blue-500"
             />
           )}
         </div>
@@ -108,9 +114,95 @@ const ApproveFromWalletNotification = () => (
   />
 );
 
-const YouAreStakingNotification = ({ sig }: { sig: string }) => (
-  <NotificationTemplate title="You are staking" type="progress" sig={sig}>
+const YouAreStakingNotification = ({
+  sig,
+  text,
+}: {
+  sig: string;
+  text: string;
+}) => (
+  <NotificationTemplate title={text} type="progress" sig={sig}>
     <span className="text-step-label text-sm">Confirmation is in progress</span>
+  </NotificationTemplate>
+);
+
+/* ************ SUCCESS COMPONENT ************ */
+
+type StakedDataRowProps = {
+  text: string;
+  Icon: ReactNode;
+  imageUrl: string;
+  amount: string;
+  thicker: string;
+};
+
+const StakedDataRow = ({
+  Icon,
+  imageUrl,
+  amount,
+  thicker,
+  text,
+}: StakedDataRowProps) => (
+  <div className="mb-3 mt-3 flex flex-col gap-5">
+    <span className="text-step-label text-sm">{text}</span>
+    <div className="text-step-label flex gap-3">
+      {Icon}
+      <Image src={imageUrl} alt="step token" height={30} width={30} />
+      <span>{amount}</span>
+      <span className="font-semibold">{thicker}</span>
+    </div>
+  </div>
+);
+
+type SuccessNProps = {
+  sig: string;
+  minusAmount: string;
+  plusAmount: string;
+};
+
+const SuccessStakingNotification = ({
+  sig,
+  minusAmount,
+  plusAmount,
+}: SuccessNProps) => (
+  <NotificationTemplate title="You staked STEP" type="success" sig={sig}>
+    <StakedDataRow
+      text="You stake:"
+      amount={minusAmount}
+      Icon={<MinusIcon {...defaultIconSize} className="fill-step-accent" />}
+      imageUrl={xStepTokenImgUrl}
+      thicker="STEP"
+    />
+    <StakedDataRow
+      text="You received:"
+      amount={plusAmount}
+      Icon={<PlusIcon {...defaultIconSize} className="fill-step-accent" />}
+      imageUrl={stepTokenImgUrl}
+      thicker="xSTEP"
+    />
+  </NotificationTemplate>
+);
+
+const SuccessUnstakingNotification = ({
+  minusAmount,
+  plusAmount,
+  sig,
+}: SuccessNProps) => (
+  <NotificationTemplate title="You unstaked xSTEP" type="success" sig={sig}>
+    <StakedDataRow
+      text="You unstaked:"
+      amount={minusAmount}
+      Icon={<MinusIcon {...defaultIconSize} className="fill-step-accent" />}
+      imageUrl={stepTokenImgUrl}
+      thicker="STEP"
+    />
+    <StakedDataRow
+      text="You received:"
+      amount={plusAmount}
+      Icon={<PlusIcon {...defaultIconSize} className="fill-step-accent" />}
+      imageUrl={xStepTokenImgUrl}
+      thicker="xSTEP"
+    />
   </NotificationTemplate>
 );
 
@@ -118,4 +210,6 @@ export {
   ErrorNotification,
   ApproveFromWalletNotification,
   YouAreStakingNotification,
+  SuccessStakingNotification,
+  SuccessUnstakingNotification,
 };

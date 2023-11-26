@@ -42,7 +42,7 @@ import {
   convertToRegularNum,
   resolveAmountInput,
 } from "~/app/utils";
-import SwapInput from "./Input";
+import StakeInput from "./Input";
 import {
   StakeHeaderAndDescription,
   StakeButton,
@@ -57,6 +57,8 @@ import idl from "~/app/step_staking.json";
 import {
   ApproveFromWalletNotification,
   ErrorNotification,
+  SuccessStakingNotification,
+  SuccessUnstakingNotification,
   YouAreStakingNotification,
 } from "../components/NotificationComponents";
 import AccountListener from "./AccountListener";
@@ -86,6 +88,7 @@ const StakeContainer = ({ price }: { price: string }) => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [txFlowInProgress, setTxFlowInProgress] = useState(false);
   /* Program state */
+  const [signature, setSignature] = useState("");
   const [program, setProgram] = useState<Program<Idl>>();
   const [vaultPubkey, setVaultPubkey] = useState<PublicKey>();
   const [vaultBump, setVaultBump] = useState<number>();
@@ -122,7 +125,7 @@ const StakeContainer = ({ price }: { price: string }) => {
       return "approveFromWallet";
     }
 
-    return "stake";
+    return selectedTabIndex ? "unstake" : "stake";
   }, [
     txFlowInProgress,
     selectedTabIndex,
@@ -142,7 +145,6 @@ const StakeContainer = ({ price }: { price: string }) => {
     xstep: xStepBalance,
   };
 
-  // TODO: maybe with anchor?
   const getTokensInfo = async () => {
     if (!publicKey) return;
 
@@ -288,21 +290,17 @@ const StakeContainer = ({ price }: { price: string }) => {
     }
   };
 
-  const handleAnchor = async () => {
+  const handleStake = async () => {
     if (!wallet || !program || !stepToken || !xStepToken) return;
 
-    const targetAmount = convertDecimalsToAmount(
-      selectedTabIndex ? xStepAmount : stepAmount,
-    );
+    const targetAmount = convertDecimalsToAmount(stepAmount);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const txAmount = new BN(targetAmount);
     setTxFlowInProgress(true);
+    const toastId = toast.custom(<ApproveFromWalletNotification />);
 
     try {
-      console.log("handle anchor");
-
       /* @ts-expect-error  because! :D */
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const sig = await program.rpc.stake(vaultBump, txAmount, {
         accounts: {
           tokenMint: stepMintPubkey,
@@ -314,22 +312,49 @@ const StakeContainer = ({ price }: { price: string }) => {
           tokenProgram: TOKEN_PROGRAM_ID,
         },
       });
-      toast.custom(<YouAreStakingNotification sig={sig} />);
+
+      setSignature(sig);
+      toast.custom(
+        <YouAreStakingNotification sig={sig} text="You are staking STEP" />,
+      );
     } catch (err) {
       toast.custom(<ErrorNotification />);
-      console.log("Handle Anchor Error:", err);
     } finally {
-      setTxFlowInProgress(false);
+      toast.dismiss(toastId);
     }
   };
 
-  const handleToast = () => {
-    const x = convertDecimalsToAmount(stepAmount);
-    console.log("lam", { x });
+  const handleUnstake = async () => {
+    if (!wallet || !program || !stepToken || !xStepToken) return;
 
-    toast.custom(<ErrorNotification />, { duration: 2000 });
-    toast.custom(<ApproveFromWalletNotification />, { duration: 2000 });
-    toast.custom(<YouAreStakingNotification sig="123" />, { duration: 2000 });
+    const targetAmount = convertDecimalsToAmount(xStepAmount);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const txAmount = new BN(targetAmount);
+    setTxFlowInProgress(true);
+    const toastId = toast.custom(<ApproveFromWalletNotification />);
+    try {
+      /* @ts-expect-error  because! :D */
+      const sig = await program.rpc.unstake(vaultBump, txAmount, {
+        accounts: {
+          tokenMint: stepMintPubkey,
+          xTokenMint: xStepMintPubkey,
+          xTokenFrom: xStepToken.pubkey,
+          xTokenFromAuthority: wallet.publicKey,
+          tokenVault: vaultPubkey,
+          tokenTo: stepToken.pubkey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        },
+      });
+
+      setSignature(sig);
+      toast.custom(
+        <YouAreStakingNotification sig={sig} text="You are unstaking" />,
+      );
+    } catch (err) {
+      toast.custom(<ErrorNotification />);
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   useEffect(() => {
@@ -347,16 +372,38 @@ const StakeContainer = ({ price }: { price: string }) => {
       {/* Swap */}
       {connected ? (
         <div className="mt-4">
-          <AccountListener
-            onAccountChange={getTokensInfo}
-            stepAccount={stepToken?.pubkey}
-            xStepAccount={xStepToken?.pubkey}
-          />
+          {txFlowInProgress && signature && (
+            <AccountListener
+              onAccountChange={(ac) => {
+                console.log("on change", { ac, signature });
+                toast.custom(
+                  selectedTabIndex ? (
+                    <SuccessUnstakingNotification
+                      sig={signature}
+                      minusAmount={xStepAmount}
+                      plusAmount={stepAmount}
+                    />
+                  ) : (
+                    <SuccessStakingNotification
+                      sig={signature}
+                      minusAmount={stepAmount}
+                      plusAmount={xStepAmount}
+                    />
+                  ),
+                ),
+                  getTokensInfo();
+                setTxFlowInProgress(false);
+              }}
+              stepAccount={stepToken?.pubkey}
+              xStepAccount={xStepToken?.pubkey}
+            />
+          )}
           <StakeHeaderAndDescription />
           <div className="mt-[20px] w-[450px]">
             <Tab.Group selectedIndex={selectedTabIndex}>
               <Tab.List>
-                <Tab as={Fragment}>
+                {/* @ts-ignore */}
+                <Tab as={Fragment} disabled={txFlowInProgress}>
                   {({ selected }) => (
                     <TabButton
                       onClick={() => setSelectedTabIndex(0)}
@@ -366,7 +413,8 @@ const StakeContainer = ({ price }: { price: string }) => {
                     />
                   )}
                 </Tab>
-                <Tab as={Fragment}>
+                {/* @ts-ignore */}
+                <Tab as={Fragment} disabled={txFlowInProgress}>
                   {({ selected }) => (
                     <TabButton
                       onClick={() => setSelectedTabIndex(1)}
@@ -389,7 +437,7 @@ const StakeContainer = ({ price }: { price: string }) => {
               >
                 {/* STAKE */}
                 <Tab.Panel className="focus:bg-none focus:outline-none">
-                  <SwapInput
+                  <StakeInput
                     tokenName="STEP"
                     amount={stepAmount}
                     price={price}
@@ -401,7 +449,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     onMaxClick={() => handleHalfMaxClick("step", "max")}
                   />
                   <ArrowSeparator />
-                  <SwapInput
+                  <StakeInput
                     tokenName="xSTEP"
                     amount={xStepAmount}
                     price={xPrice}
@@ -413,7 +461,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                 </Tab.Panel>
                 {/* UNSTAKE */}
                 <Tab.Panel>
-                  <SwapInput
+                  <StakeInput
                     tokenName="xSTEP"
                     amount={xStepAmount}
                     price={xPrice}
@@ -425,7 +473,7 @@ const StakeContainer = ({ price }: { price: string }) => {
                     onMaxClick={() => handleHalfMaxClick("xstep", "max")}
                   />
                   <ArrowSeparator />
-                  <SwapInput
+                  <StakeInput
                     tokenName="STEP"
                     amount={stepAmount}
                     price={price}
@@ -439,11 +487,9 @@ const StakeContainer = ({ price }: { price: string }) => {
             </Tab.Group>
             <StakeButton
               textType={buttonType}
-              onClick={() => {
-                void handleAnchor();
-                // handleToast();
-                console.log("stake");
-              }}
+              onClick={() =>
+                selectedTabIndex ? handleUnstake() : handleStake()
+              }
             />
           </div>
         </div>
